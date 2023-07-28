@@ -3,7 +3,7 @@
 
 #define NUMBER_FLOP_EPSILON 0.00001
 
-#include <Arduino.h>
+#include <math.h>
 
 class Number {
   private:

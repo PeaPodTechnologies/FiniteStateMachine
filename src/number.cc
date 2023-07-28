@@ -1,6 +1,6 @@
 #include <number.h>
 
-#include <Arduino.h>
+#include <math.h>
 
 int Number::compare(const Number& other) const {
   if(other.isNaN() && this->isNaN()) return 0;

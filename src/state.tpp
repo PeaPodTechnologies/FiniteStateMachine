@@ -77,6 +77,8 @@ template <> ConditionalCallback<Number>* State<Number>::addLoggerCallback(void (
 
 template <> ConditionalCallback<bool>* State<bool>::addLoggerCallback(void (* const cb)(bool comp, bool val)) { return addConditional(new ConditionalCallback<bool>(CMP_NOP, false, cb)); }
 
+template <> ConditionalCallback<unsigned long>* State<unsigned long>::addLoggerCallback(void (* const cb)(bool comp, unsigned long val)) { return addConditional(new ConditionalCallback<unsigned long>(CMP_NEQ, NAN, cb)); }
+
 template <> ConditionalCallback<Number>* State<Number>::addLatchingSetFlag(const Number& on, const Number& off, Flag* flag) {
   // if(on < off) {
     // "heater"
@@ -112,16 +114,16 @@ template <> ConditionalCallback<bool>* State<bool>::addLatchingConditional(const
 }
 
 template <> ConditionalCallback<bool>* State<bool>::addLatchingSetFlag(const bool& on, const bool& off, Flag* flag) {
-  addConditional(new LatchingFlagSet(flag, (char)on < (char)off));
+  return addConditional(new LatchingFlagSet(flag, (char)on < (char)off));
 }
 
 // OTHER ARGS
 
-template <typename T> ConditionalCallback<T>* State<T>::addLatchingConditional(const T& on, const T& off, void (* const cb)(bool comp)) { addLatchingConditional(on, off, (const void*)cb, CB_COMP); }
+template <typename T> ConditionalCallback<T>* State<T>::addLatchingConditional(const T& on, const T& off, void (* const cb)(bool comp)) { return addLatchingConditional(on, off, (const void*)cb, CB_COMP); }
 
-template <typename T> ConditionalCallback<T>* State<T>::addLatchingConditional(const T& on, const T& off, void (* const cb)(bool comp, T val)) { addLatchingConditional(on, off, (const void*)cb, CB_COMPVAL); }
+template <typename T> ConditionalCallback<T>* State<T>::addLatchingConditional(const T& on, const T& off, void (* const cb)(bool comp, T val)) { return addLatchingConditional(on, off, (const void*)cb, CB_COMPVAL); }
 
-template <typename T> ConditionalCallback<T>* State<T>::addLatchingConditional(const T& on, const T& off, void (* const cb)(bool comp, T val, T ref)) { addLatchingConditional(on, off, (const void*)cb, CB_COMPVALREF); }
+template <typename T> ConditionalCallback<T>* State<T>::addLatchingConditional(const T& on, const T& off, void (* const cb)(bool comp, T val, T ref)) { return addLatchingConditional(on, off, (const void*)cb, CB_COMPVALREF); }
 
 // template <typename T> void State<T>::reset(T val) { set(defaultValue); }
 
