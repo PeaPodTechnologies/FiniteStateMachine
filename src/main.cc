@@ -4,111 +4,111 @@
 // #define DEBUG Serial
 
 #include <state.h>
+#include <timer.h>
 
-#define PIN_BUTTON_DEC 2
-#define PIN_BUTTON_INC 3
-#define PIN_FAN 4
-#define PIN_HEATER 5
+// #include <avr/wdt.h>
 
-void logTemperature(bool _, Number num);
-void logHeater(bool _, bool heat);
-void logFan(bool _, bool fan);
+// Watering
 
-void controlFan(bool _, bool fan, bool __);
-void controlHeater(bool _, bool heat, bool __);
+#define PIN_WATERING        2
+#define DURATION_WATERING   10000     // 10 seconds
+#define PERIOD_WATERING  1800000   // 30 minutes
 
-Variable temperature(0.0);
+// Lighting
 
-Flag fan(false);
-Flag heater(false);
+#define DELAY_START 1000
 
-void setup(void) {
+#define PIN_LIGHTING_LO    4
+#define PIN_LIGHTING_HI   5
+// #define PIN_LIGHTING_PHOTO  5
+#define DURATION_LIGHTING  1000  // 16 hours
+#define PERIOD_LIGHTING     (DELAY_LIGHTING_ON + DELAY_LIGHTING_OFF)
+#define PWM_LIGHTING_LO    (unsigned char)(255*0.3)
+#define PWM_LIGHTING_HI   (unsigned char)(255*0.6)
+
+// #define DELAY_PHOTO_FLASH   // 
+// #define PERIOD_LIGHTING
+
+void logTimestamp(bool _, const fsm_timestamp_t& timestamp);
+void logHiLights(bool _, const bool& on);
+void logLoLights(bool _, const bool& on);
+
+void timerControlLights(bool on, const fsm_timestamp_t& timestamp);
+
+Flag lighting = Flag();
+Flag watering = Flag();
+
+void setup() {
   Serial.begin(115200);
+  while(!Serial);
 
-  // Serial.print("NaN == ");
-  // Serial.println((double)NAN);
+  pinMode(PIN_LIGHTING_LO, OUTPUT);
+  pinMode(PIN_LIGHTING_HI, OUTPUT);
+  pinMode(PIN_WATERING, OUTPUT);
 
-  Serial.println("===== [ SETUP ] =====");
+  Timer.addEventFlag(DELAY_START, &lighting);
+  Timer.addEventFlag(DELAY_START + DURATION_LIGHTING, &lighting, true);
 
-  pinMode(PIN_BUTTON_INC, INPUT);
-  pinMode(PIN_BUTTON_DEC, INPUT);
-  pinMode(PIN_FAN, OUTPUT);
-  pinMode(PIN_HEATER, OUTPUT);
+  Timer.addIntervalFlag(PERIOD_WATERING, &watering);
+  Timer.addIntervalFlag(PERIOD_WATERING, DURATION_WATERING, &watering, true);
 
-  // Loggers
-  temperature.addLoggerCallback(&logTemperature);
-  // heater.addLoggerCallback(&logHeater);
-  // fan.addLoggerCallback(&logFan);
-
-  // Add oneshot "trigger" conditionals: ONCE each time when temp crosses >25 and <18 (both rising and falling edges)
-  // temperature.addConditionalSetFlag(CMP_GTR, 25.0, &button_fan, true);
-  // temperature.addConditionalSetFlag(CMP_LES, 18.0, &button_heater, true);
-
-  Serial.println("== [ CBs: Temperature ] ==");
-  temperature.addLatchingSetFlag(25.0, 18.0, &fan);
-  temperature.addLatchingSetFlag(19.0, 22.0, &heater);
-
-  // Serial.println("== [ CBs: Fan ] ==");
-  fan.addLatchingConditional(true, false, &controlFan);
-
-  // Serial.println("== [ CBs: Heater ] ==");
-  heater.addLatchingConditional(true, false, &controlHeater);
+  #ifdef _AVR_WDT_H_
+    wdt_enable(WDTO_4S);
+  #endif
 }
 
-long i = 0;
+void loop() {
+  #ifdef _AVR_WDT_H_
+    wdt_reset();
+  #endif
 
-double t = 22.3;
+  fsm_timestamp_t now = millis();
 
-void loop(void) {
-  i++;
-  Serial.print("===== [ CYCLE ");
-  Serial.print(i);
-  Serial.println(" ] =====");
+  // Watchdog Timer Kickout
+  if(now > TWENTYFOURHRS_MILLIS) { while(true) { delay(1); } }
 
-  // double t = (random(150, 300) / 10.0);
-  // Serial.print("== [ Temperature Set: ");
-  // Serial.print(t);
-  // Serial.println("] ==");
-  if (digitalRead(PIN_BUTTON_DEC) == HIGH) {
-    t--;
-  } else if (digitalRead(PIN_BUTTON_INC) == HIGH) {
-    t++;
-  }
-  temperature.set(t);
+  Timer.set(now);
 
   delay(1000);
 }
 
-void controlFan(bool _, bool fan, bool __) {
-  digitalWrite(PIN_FAN, fan ? HIGH : LOW);
-  logFan(_, fan);
-}
-
-void controlHeater(bool _, bool heat, bool __) {
-  digitalWrite(PIN_HEATER, heat ? HIGH : LOW);
-  logHeater(_, heat);
-}
-
-void logTemperature(bool _, Number num) {
+void logTimestamp(bool _, const fsm_timestamp_t& timestamp) {
   DEBUG_DELAY();
-  Serial.print("== [ Temperature: ");
-  Serial.print(num);
-  Serial.println("degC ] ==");
+  Serial.print("==== [ Time Elapsed: ");
+  unsigned long seconds = timestamp / 1000;
+  unsigned long minutes = seconds / 60;
+  unsigned long hours = minutes / 60;
+
+  seconds -= minutes * 60;
+  minutes -= hours * 60;
+
+  if(hours < 10) Serial.print("0");
+  Serial.print(hours);
+  Serial.print("h : ");
+  if(minutes < 10) Serial.print("0");
+  Serial.print(minutes - hours * 60);
+  Serial.print("m : ");
+  if(seconds < 10) Serial.print("0");
+  Serial.print(seconds);
+  Serial.println("s ] ====");
   DEBUG_DELAY();
 }
 
-void logHeater(bool _, bool heat) {
-  const char* buf = ((char)heat == 1 ? "== [ Heat: ON ] ==" : "== [ Heat: OFF ] ==");
+void logLights(bool _, const bool& on) {
+  const char* buf = (on ? "== [ Lights: ON ] ==" : "== [ Lights: OFF ] ==");
   DEBUG_DELAY();
   Serial.println(buf);
   DEBUG_DELAY();
 }
 
-void logFan(bool _, bool fan) {
-  const char* buf = ((char)fan == 1 ? "== [ Fan: ON ] ==" : "== [ Fan: OFF ] ==");
-  DEBUG_DELAY();
-  Serial.println(buf);
-  DEBUG_DELAY();
+void timerControlLights(bool on, const fsm_timestamp_t& timestamp) {
+  if(on) {
+    analogWrite(PIN_LIGHTING_HI, PWM_LIGHTING_HI);
+    analogWrite(PIN_LIGHTING_LO, PWM_LIGHTING_LO);
+  } else {
+    analogWrite(PIN_LIGHTING_HI, LOW);
+    analogWrite(PIN_LIGHTING_LO, LOW);
+  }
 }
 
 #endif

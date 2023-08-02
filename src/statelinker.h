@@ -1,6 +1,11 @@
 #ifndef FSM_STATELINKER_H_
 #define FSM_STATELINKER_H_
 
+// Class Forwarrd-Declarations (for <state.h>)
+template <typename T> class FlagSetCondition;
+class LatchingFlagSet;
+class BangBangFlagSet;
+
 #include <state.h>
 #include <comparators.h>
 #include <number.h>
@@ -9,13 +14,11 @@ template <typename T> class FlagSetCondition : public ConditionalCallback<T> {
   protected:
     Flag* flag;
 
-    void setFlag(bool flag);
-
     void childCallback(bool comp, const T& val, const T& ref) override;
     
   public:
-    FlagSetCondition(comparators_t cmp, const T& ref, Flag* flag, T (* const getReference)(T val) = nullptr);
-    FlagSetCondition(comparators_t cmp, const T& ref, Flag* flag, bool invert, T (* const getReference)(T val) = nullptr);
+    FlagSetCondition(comparators_t cmp, const T& ref, Flag* flag, typename ConditionalCallback<T>::cb_getref_t getReference = nullptr);
+    FlagSetCondition(comparators_t cmp, const T& ref, Flag* flag, bool invert, typename ConditionalCallback<T>::cb_getref_t getReference = nullptr);
 };
 
 class BangBangFlagSet : public FlagSetCondition<Number> {
@@ -45,9 +48,9 @@ class LatchingFlagSet : public FlagSetCondition<bool> {
   protected:
     void callOperator(const bool& val, const bool& ref) override;
     void childCallback(bool comp, const bool& val, const bool& ref) override;
-    const bool& childReference(const bool& val) override { return this->state; };
+    const bool& childReference(const bool& val) override;
   public:
-    LatchingFlagSet(Flag* flag, bool invert = false);
+    explicit LatchingFlagSet(Flag* flag, bool invert = false);
 };
 
 // template <typename T> class OneShotFlagReset : public FlagSetCondition<T> {

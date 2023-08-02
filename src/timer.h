@@ -2,26 +2,56 @@
 #define FSM_TIMER_H_
 
 #include <state.h>
-#include <statelinker.h>
 #include <comparators.h>
-#include <number.h>
 
 #define INTERVAL_RESET_WINDOW 1.25
-#define TWENTYFOURHRS_MILLIS (24*60*60*1000)
+#define TWENTYFOURHRS_MILLIS ((fsm_timestamp_t)86400000)
 
-class Interval : private ConditionalCallback<unsigned long> {
+class Interval : private ConditionalCallback<fsm_timestamp_t> {
   private:
     // Time since last reset (ms)
-    unsigned long now = 0;
+    fsm_timestamp_t now = 0;
+    fsm_timestamp_t phase = 0;
   protected:
-    const unsigned long& childReference(const unsigned long& val) override;
+    const fsm_timestamp_t& childReference(const fsm_timestamp_t& val) override;
   public:
-    Interval(const unsigned long& delta, const void* cb, callback_type_t cbtype);
+    Interval(const fsm_timestamp_t& delta, const void* cb, callback_type_t cbtype, bool invert = false);
 
-    Interval(const unsigned long& now, const unsigned long& delta, const void* cb, callback_type_t cbtype);
+    Interval(const fsm_timestamp_t& delta, const fsm_timestamp_t& phase, const void* cb, callback_type_t cbtype, bool invert = false);
 
-    unsigned long get(void);
-    void set(const unsigned long& val);
+    fsm_timestamp_t get(void);
+    void set(const fsm_timestamp_t& val);
+};
+
+class FlagInterval : public Interval {
+  private:
+    Flag* flag;
+  protected:
+    void childCallback(bool comp, const fsm_timestamp_t& val, const fsm_timestamp_t& ref) override;
+  public:
+    FlagInterval(const fsm_timestamp_t& delta, Flag* flag, bool invert = false);
+    FlagInterval(const fsm_timestamp_t& delta, const fsm_timestamp_t& phase,  Flag* flag, bool invert = false);
+};
+
+class Event : public ConditionalCallback<fsm_timestamp_t> {
+  private:
+    // Has the callback been triggered yet?
+    bool triggered = false;
+  protected:
+    void callOperator(const fsm_timestamp_t& val, const fsm_timestamp_t& ref) override;
+  public:
+    Event(const fsm_timestamp_t& timestamp, typename ConditionalCallback<fsm_timestamp_t>::cb_compval_t cb, bool invert = false);
+};
+
+class FlagEvent : public FlagSetCondition<fsm_timestamp_t> {
+  private:
+    // Has the callback been triggered yet?
+    bool triggered = false;
+  protected:
+    void callOperator(const fsm_timestamp_t& val, const fsm_timestamp_t& ref) override;
+    void childCallback(bool comp, const fsm_timestamp_t& val, const fsm_timestamp_t& ref) override;
+  public:
+    FlagEvent(const fsm_timestamp_t& timestamp, Flag* flag, bool invert = false);
 };
 
 /**
@@ -30,30 +60,33 @@ class Interval : private ConditionalCallback<unsigned long> {
  * Keeps track of relative time, in milliseconds from program start.
 */
 
-class _Timer : private State<unsigned long> {
+class _Timer : private State<fsm_timestamp_t> {
   private:
-    const unsigned long start;
-    const unsigned long last;
+    const fsm_timestamp_t start;
+    const fsm_timestamp_t last;
 
-    Interval* intervals[MAX_CONDITIONALS] = { };
+    Interval* intervals[MAX_CONDITIONALS] = { nullptr };
 
-    void incrementIntervals(const unsigned long& delta);
+    void incrementIntervals(const fsm_timestamp_t& delta);
   public:
-    _Timer(const unsigned long& start = 1000);
+    _Timer(const fsm_timestamp_t& start = 1000);
 
-    ConditionalCallback<unsigned long>* addEvent(const unsigned long& timestamp, void (* const cb)(bool, unsigned long), unsigned long (*const getReference)(void) = nullptr);
-    ConditionalCallback<unsigned long>* addEventFlag(const unsigned long& timestamp, Flag* flag, unsigned long (*const getReference)(void) = nullptr);
-    Interval* addInterval(const unsigned long& delta, void (* const cb)(bool, unsigned long), unsigned long (*const getReference)(void) = nullptr);
+    ConditionalCallback<fsm_timestamp_t>* addEvent(const fsm_timestamp_t& timestamp, typename ConditionalCallback<fsm_timestamp_t>::cb_compval_t cb, bool invert = false);
+    ConditionalCallback<fsm_timestamp_t>* addEventFlag(const fsm_timestamp_t& timestamp, Flag* flag, bool invert = false);
+    Interval* addInterval(const fsm_timestamp_t& delta, typename ConditionalCallback<fsm_timestamp_t>::cb_compval_t cb, bool invert = false);
+    Interval* addInterval(const fsm_timestamp_t& delta, const fsm_timestamp_t& phase, typename ConditionalCallback<fsm_timestamp_t>::cb_compval_t cb, bool invert = false);
+    Interval* addIntervalFlag(const fsm_timestamp_t& delta, Flag* flag, bool invert = false);
+    Interval* addIntervalFlag(const fsm_timestamp_t& delta, const fsm_timestamp_t& phase, Flag* flag, bool invert = false);
     
-    Interval* addTwentyFourTimeout(const unsigned long& delay, void (* const cb)(bool, unsigned long), unsigned long (*const getReference)(void) = nullptr);
+    Interval* addTwentyFourTimeout(const fsm_timestamp_t& delay, typename ConditionalCallback<fsm_timestamp_t>::cb_compval_t cb, bool invert = false);
 
     // EXPOSE SOME PUBLIC BASE CLASS MEMBERS
 
-    void set(const unsigned long& val);
+    void set(const fsm_timestamp_t& val);
 
-    ConditionalCallback<unsigned long>* addLoggerCallback(void (*cb)(bool, unsigned long));
+    // ConditionalCallback<fsm_timestamp_t>* addLoggerCallback(void (*cb)(bool, fsm_timestamp_t));
 };
 
-static _Timer Timer;
+static _Timer Timer = _Timer();
 
 #endif

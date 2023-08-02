@@ -5,6 +5,8 @@
 
 #include <math.h>
 
+typedef unsigned long fsm_timestamp_t;
+
 class Number {
   private:
     double value;
@@ -54,7 +56,8 @@ class Number {
     bool operator>(const Number& rhs) const;
     bool operator>=(const Number& rhs) const;
 
-    operator double() const { return this->isNaN() ? (double)NAN : this->value; }
+    operator double() const;
+    operator fsm_timestamp_t()  const;
     // operator long() const;
     // operator int() const;
 
@@ -63,9 +66,9 @@ class Number {
     Number operator*(const Number& rhs) const;
     Number operator/(const Number& rhs) const;
 
-    static const Number& minimum(const Number& a, const Number& b) { return a > b ? b : a; }
+    static const Number& minimum(const Number& a, const Number& b);
 
-    static const Number& maximum(const Number& a, const Number& b) { return a < b ? b : a; }
+    static const Number& maximum(const Number& a, const Number& b);
 };
 
 #endif

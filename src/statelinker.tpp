@@ -1,17 +1,26 @@
+#ifndef FSM_STATELINKER_H_
+#error __FILE__ should only be included AFTER <statelinker.h>
+// #include <statelinker.h>
+#endif
+
+#ifndef FSM_STATE_H_
+#error __FILE__ should only be included AFTER <state.h>
+// #include <state.h>
+#endif
+
+#ifdef FSM_STATELINKER_H_
+#ifdef FSM_STATE_H_
+
 #ifndef FSM_STATELINKER_T_
 #define FSM_STATELINKER_T_
 
-#include <statelinker.h>
-
-#include <state.h>
-#include <comparators.h>
-#include <number.h>
+// #error STATELINKER.TPP
 
 typedef void (*const flagSetCB_t)(bool);
 
-template <typename T> FlagSetCondition<T>::FlagSetCondition(comparators_t cmp, const T& ref, Flag* flag, T (* const getReference)(T val)) : flag(flag), ConditionalCallback<T>(cmp, ref, getReference) { }
+template <typename T> FlagSetCondition<T>::FlagSetCondition(comparators_t cmp, const T& ref, Flag* flag, typename ConditionalCallback<T>::cb_getref_t getReference) : flag(flag), ConditionalCallback<T>(cmp, ref, getReference) { }
 
-template <typename T> FlagSetCondition<T>::FlagSetCondition(comparators_t cmp, const T& ref, Flag* flag, bool invert, T (* const getReference)(T val)) : flag(flag), ConditionalCallback<T>(cmp, ref, invert, getReference) { }
+template <typename T> FlagSetCondition<T>::FlagSetCondition(comparators_t cmp, const T& ref, Flag* flag, bool invert, typename ConditionalCallback<T>::cb_getref_t getReference) : flag(flag), ConditionalCallback<T>(cmp, ref, invert, getReference) { }
 
 template <typename T> void FlagSetCondition<T>::childCallback(bool comp, const T& val, const T& ref) {
   #ifdef DEBUG
@@ -24,144 +33,6 @@ template <typename T> void FlagSetCondition<T>::childCallback(bool comp, const T
   this->flag->set(comp);
 }
 
-BangBangFlagSet::BangBangFlagSet(const Number& lo, const Number& hi, Flag* flag) : low(Number::minimum(lo, hi)), high(Number::maximum(lo, hi)), FlagSetCondition<Number>(CMP_LES, low, flag, (double)hi < (double)lo) {
-  #ifdef DEBUG
-    DEBUG_DELAY();
-    DEBUG.print("BangBang FlagSet [");
-    DEBUG.print((double)lo);
-    DEBUG.print(", ");
-    DEBUG.print((double)hi);
-    DEBUG.print("]\n");
-    DEBUG_DELAY();
-  #endif
-}
-
-void BangBangFlagSet::childCallback(bool comp, const Number& val, const Number& ref) {
-  this->state = (ref == this->high);
-
-  #ifdef DEBUG
-    if(state) {
-      DEBUG_DELAY();
-      DEBUG.print("BangBang (High)\n");
-      DEBUG_DELAY();
-    } else {
-      DEBUG_DELAY();
-      DEBUG.print("BangBang (Low)\n");
-      DEBUG_DELAY();
-    }
-  #endif
-
-  // state ? comp : !comp;
-  // T XOR T = T
-  // F XOR T = F
-  // T XOR F = F
-  // F XOR F = T
-  // comp = !(comp ^ this->state);
-  // comp = this->state ? comp : !comp;
-  bool _  = !(this->invert ^ this->state);
-
-  #ifdef DEBUG
-    DEBUG_DELAY();
-    DEBUG.print("Flag Set (");
-    DEBUG.print(_ ? "true" : "false");
-    DEBUG.print(")\n");
-    DEBUG_DELAY();
-  #endif
-  this->flag->set(_);
-}
-
-const Number& BangBangFlagSet::childReference(const Number& val) {
-  #ifdef DEBUG
-    DEBUG_DELAY();
-    DEBUG.print("BangBang State: ");
-    DEBUG.print(BOOLSTR(this->state));
-    DEBUG.print("\n");
-    DEBUG_DELAY();
-  #endif
-  if (this->state && val <= this->low) {
-    this->setComparator(CMP_LES);
-    this->triggered = false;
-    this->state = false;
-    #ifdef DEBUG
-      DEBUG_DELAY();
-      DEBUG.print("BangBang State: Expecting Low\n");
-      DEBUG_DELAY();
-    #endif
-  } else if (!this->state && val >= this->high) {
-    this->setComparator(CMP_GTR);
-    this->triggered = false;
-    this->state = true;
-    #ifdef DEBUG
-      DEBUG_DELAY();
-      DEBUG.print("BangBang State: Expecting High\n");
-      DEBUG_DELAY();
-    #endif
-  }
-  return this->state ? this->high : this->low;
-}
-
-void BangBangFlagSet::callOperator(const Number& val, const Number& ref) {
-  bool result = compare(this->comparator, val, ref);
-  if(!this->triggered && result) {
-    this->triggered = true;
-    this->executeCallback(val, ref);
-  } else if(!result) {
-    // Reset
-    #ifdef DEBUG
-      DEBUG_DELAY();
-      DEBUG.print("BangBang Trigger Reset!\n");
-      DEBUG_DELAY();
-    #endif
-    this->triggered = false;
-  }
-}
-
-void LatchingFlagSet::callOperator(const bool& val, const bool& ref) {
-  bool result = compare(this->comparator, val, ref);
-  if(!this->triggered && result) {
-    this->executeCallback(val, ref);
-    this->triggered = true;
-  } else if(!result) {
-    // Reset
-    #ifdef DEBUG
-      DEBUG_DELAY();
-      DEBUG.print("Trigger Reset!\n");
-      DEBUG_DELAY();
-    #endif
-    this->triggered = false;
-  }
-}
-
-LatchingFlagSet::LatchingFlagSet(Flag* flag, bool invert) : FlagSetCondition<bool>(CMP_EQU, !invert, flag, invert) { }
-
-
-void LatchingFlagSet::childCallback(bool comp, const bool& val, const bool& ref) {
-  this->state = !ref;
-  this->triggered = false;
-
-  #ifdef DEBUG
-    if(val) {
-      DEBUG_DELAY();
-      DEBUG.print("Latch (High)\n");
-      DEBUG_DELAY();
-    } else {
-      DEBUG_DELAY();
-      DEBUG.print("Latch (Low)\n");
-      DEBUG_DELAY();
-    }
-  #endif
-
-  bool _ = val ^ ref;
-
-  // Cast void* cb fn pointer to appropriate type and call
-  #ifdef DEBUG
-    DEBUG_DELAY();
-    DEBUG.print("Flag Set (");
-    DEBUG.print(_ ? "true" : "false");
-    DEBUG.print(")\n");
-    DEBUG_DELAY();
-  #endif
-  this->flag->set(_);
-}
-
+#endif
+#endif
 #endif

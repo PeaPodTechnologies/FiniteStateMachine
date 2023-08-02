@@ -1,3 +1,5 @@
+#define FSM_SRC 1
+
 #include <number.h>
 
 #include <math.h>
@@ -59,6 +61,8 @@ bool Number::isNaN(void) const {
 
 double Number::operator()(void) const { return this->operator double(); }
 
+Number::operator double() const { return this->isNaN() ? (double)NAN : this->value; }
+
 void Number::operator=(const double& rhs) { this->set(rhs); }
 void Number::operator=(const float& rhs) { this->set(rhs); }
 void Number::operator=(const long& rhs) { this->set((double)rhs, false, rhs < 0); }
@@ -76,7 +80,7 @@ Number& Number::operator=(const Number& other) {
   return (*this); 
 }
 
-bool Number::operator==(const Number& rhs) const { return (compare(rhs) == 0); }
+bool Number::operator==(const Number& rhs) const { return (compare(rhs) == 0) && !(this->isFloating ^ rhs.isFloating); }
 
 bool Number::operator!=(const Number& rhs) const { return (compare(rhs) != 0); }
 
@@ -125,3 +129,7 @@ Number Number::operator/(const Number& rhs) const {
 
   return (rhs.value < NUMBER_FLOP_EPSILON && rhs.value > -NUMBER_FLOP_EPSILON) ? Number() : Number(this->value / rhs.value, true, rhs.isSigned || this->isSigned); 
 }
+
+const Number& Number::minimum(const Number& a, const Number& b) { return a > b ? b : a; }
+
+const Number& Number::maximum(const Number& a, const Number& b) { return a < b ? b : a; }
