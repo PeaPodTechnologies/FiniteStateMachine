@@ -1,7 +1,6 @@
-#define FSM_SRC 1
-
 #include <statelinker.h>
 
+#include <debug.h>
 #include <state.h>
 #include <comparators.h>
 #include <number.h>

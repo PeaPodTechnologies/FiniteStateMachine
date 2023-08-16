@@ -12,6 +12,8 @@
 
 #define BOOLSTR(b) (b ? "true" : "false")
 
+#include <debug.h>
+
 // TODO: All T args in callbacks -> const T&
 // TODO: Replace all OneShot with Latching (duh)
 

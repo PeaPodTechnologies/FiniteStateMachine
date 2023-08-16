@@ -1,7 +1,6 @@
-#define FSM_SRC 1
-
 #include <comparators.h>
 
+#include <debug.h>
 #include <number.h>
 
 template <> bool ConditionalCallback<bool>::compare(comparators_t cmp, const bool& val, const bool& ref) {

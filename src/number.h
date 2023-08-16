@@ -57,7 +57,7 @@ class Number {
     bool operator>=(const Number& rhs) const;
 
     operator double() const;
-    operator fsm_timestamp_t()  const;
+    explicit operator fsm_timestamp_t()  const;
     // operator long() const;
     // operator int() const;
 

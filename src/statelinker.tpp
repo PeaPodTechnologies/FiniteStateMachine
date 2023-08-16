@@ -14,6 +14,8 @@
 #ifndef FSM_STATELINKER_T_
 #define FSM_STATELINKER_T_
 
+#include <debug.h>
+
 // #error STATELINKER.TPP
 
 typedef void (*const flagSetCB_t)(bool);

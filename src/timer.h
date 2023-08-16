@@ -4,14 +4,18 @@
 #include <state.h>
 #include <comparators.h>
 
-#define INTERVAL_RESET_WINDOW 1.25
+#define MAX_INTERVALS 32
+#define INTERVAL_RESET_WINDOW 1.05
 #define TWENTYFOURHRS_MILLIS ((fsm_timestamp_t)86400000)
 
 class Interval : private ConditionalCallback<fsm_timestamp_t> {
   private:
     // Time since last reset (ms)
     fsm_timestamp_t now = 0;
-    fsm_timestamp_t phase = 0;
+    const fsm_timestamp_t phase = 0;
+    const fsm_timestamp_t delta;
+
+    fsm_timestamp_t refholder;
   protected:
     const fsm_timestamp_t& childReference(const fsm_timestamp_t& val) override;
   public:
@@ -65,9 +69,7 @@ class _Timer : private State<fsm_timestamp_t> {
     const fsm_timestamp_t start;
     const fsm_timestamp_t last;
 
-    Interval* intervals[MAX_CONDITIONALS] = { nullptr };
-
-    void incrementIntervals(const fsm_timestamp_t& delta);
+    Interval* intervals[MAX_INTERVALS] = { nullptr };
   public:
     _Timer(const fsm_timestamp_t& start = 1000);
 
@@ -83,6 +85,7 @@ class _Timer : private State<fsm_timestamp_t> {
     // EXPOSE SOME PUBLIC BASE CLASS MEMBERS
 
     void set(const fsm_timestamp_t& val);
+    fsm_timestamp_t get(void);
 
     // ConditionalCallback<fsm_timestamp_t>* addLoggerCallback(void (*cb)(bool, fsm_timestamp_t));
 };

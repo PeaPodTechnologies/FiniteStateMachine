@@ -18,6 +18,8 @@ template <typename T> void stateDebug(const T& val);
 
 template <typename T> class State {
   private:
+    const char* key = nullptr;
+    
     T value;
     const T defaultValue;
 
@@ -26,6 +28,7 @@ template <typename T> class State {
     ConditionalCallback<T>* conditionals[MAX_CONDITIONALS] = { nullptr };
   public:
     explicit State(const T& value);
+    State(const T& value, const char* key);
     // ~State();
 
     T get(void);

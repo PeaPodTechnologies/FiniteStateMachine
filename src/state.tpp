@@ -15,7 +15,10 @@
 
 // #error STATE.TPP
 
+#include <debug.h>
+
 template <typename T> State<T>::State(const T& value) : value(value), defaultValue(value) { }
+template <typename T> State<T>::State(const T& value, const char* key) : value(value), defaultValue(value), key(key) { }
 
 template <typename T> T State<T>::get(void) {
   return this->value;
@@ -24,10 +27,15 @@ template <typename T> T State<T>::get(void) {
 template <typename T> void State<T>::set(const T& val) {
   #ifdef DEBUG
     DEBUG_DELAY();
-    DEBUG.print("State Set: ");
+    if(this->key == nullptr) {
+      DEBUG.print("State Set: ");
+    } else {
+      DEBUG.print(this->key);
+      DEBUG.print(" Set: ");
+    }
     stateDebug<T>(val);
     DEBUG.print("\n");
-    DEBUG.print("----------");
+    DEBUG.print("==== [ Conditionals ] ====");
     DEBUG.print("\n");
     DEBUG_DELAY();
   #endif
@@ -40,8 +48,12 @@ template <typename T> void State<T>::set(const T& val) {
 
   #ifdef DEBUG
     DEBUG_DELAY();
-    DEBUG.print("----------");
-    DEBUG.print("\n");
+    DEBUG.print("==== [ End of Conditionals");
+    if(this->key != nullptr) {
+      DEBUG.print(": ");
+      DEBUG.print(this->key);
+    }
+    DEBUG.print(" ] ====\n");
     DEBUG_DELAY();
   #endif
 

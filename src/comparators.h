@@ -3,8 +3,6 @@
 
 #include <number.h>
 
-#define DEBUG_DELAY() {delay(100);}
-
 #define NOP_COMP_BOOL true
 #define NOP_COMP_NUMBER false
 

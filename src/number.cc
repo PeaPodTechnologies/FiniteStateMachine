@@ -1,8 +1,8 @@
-#define FSM_SRC 1
-
 #include <number.h>
 
 #include <math.h>
+
+#include <debug.h>
 
 int Number::compare(const Number& other) const {
   if(other.isNaN() && this->isNaN()) return 0;
