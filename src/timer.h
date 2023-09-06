@@ -90,6 +90,6 @@ class _Timer : private State<fsm_timestamp_t> {
     // ConditionalCallback<fsm_timestamp_t>* addLoggerCallback(void (*cb)(bool, fsm_timestamp_t));
 };
 
-static _Timer Timer = _Timer();
+extern _Timer Timer;
 
 #endif

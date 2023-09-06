@@ -80,6 +80,10 @@ template <typename T> class ConditionalCallback {
 
     static bool compare(comparators_t cmp, const T& val, const T& ref);
 
+    void disable();
+    void enable();
+    void enable(const T& val);
+
   protected:
     // NO CALLBACK - ASSUMES childCallback is implemented
     ConditionalCallback(comparators_t cmp, const T& ref, cb_getref_t getReference = nullptr);
@@ -100,6 +104,8 @@ template <typename T> class ConditionalCallback {
     T reference;
 
     const bool invert = false;
+
+    bool disabled = false;
 
     const void* callback;
 

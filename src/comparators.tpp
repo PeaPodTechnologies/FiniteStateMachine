@@ -70,6 +70,8 @@ template <typename T> void ConditionalCallback<T>::childCallback(bool comp, cons
 template <typename T> const T& ConditionalCallback<T>::childReference(const T& val) { return this->reference; }
 
 template <typename T> void ConditionalCallback<T>::operator()(const T& val) { 
+  if(this->disabled) return;
+  
   // Update the reference value
   if (this->getReference != nullptr) {
     this->reference = this->getReference(val);
@@ -158,6 +160,10 @@ template <typename T> void ConditionalCallback<T>::executeCallback(const T& val,
       break;
   }
 }
+
+template <typename T> void ConditionalCallback<T>::disable() { this->disabled = true; }
+template <typename T> void ConditionalCallback<T>::enable() { this->disabled = false; }
+template <typename T> void ConditionalCallback<T>::enable(const T& val) { this->disabled = false; this->executeCallback(val, this->reference); }
 
 #endif
 

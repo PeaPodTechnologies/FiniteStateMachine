@@ -5,6 +5,7 @@
 #include <state.h>
 #include <comparators.h>
 
+_Timer Timer = _Timer();
 
 #ifdef DEBUG
 // Helper
@@ -111,7 +112,9 @@ _Timer::_Timer(const fsm_timestamp_t& start) : start(start), last(start), State<
   }
 }
 
-void _Timer::set(const fsm_timestamp_t& val) {
+void _Timer::set(const fsm_timestamp_t& _val) {
+  fsm_timestamp_t val = _val % TWENTYFOURHRS_MILLIS;
+
   const fsm_timestamp_t last = this->get();
 
   // Null frame

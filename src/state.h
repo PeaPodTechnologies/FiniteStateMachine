@@ -19,9 +19,11 @@ template <typename T> void stateDebug(const T& val);
 template <typename T> class State {
   private:
     const char* key = nullptr;
-    
+
     T value;
     const T defaultValue;
+
+    bool disabled = false;
 
     unsigned char numconditionals = 0;
   protected:
@@ -67,6 +69,19 @@ template <typename T> class State {
     // virtual void set(T val) = 0;
 
     operator T() const { return value; };
+
+    bool isDisabled();
+
+    // Enable, No Set
+    void enable();
+    // Enable, Re-Set
+    void resume();
+    // Enable, Set
+    void enable(const T& val);
+    // Disable, No-Set
+    void disable();
+    // Disable, Set
+    void disable(const T& val);
 };
 
 class Variable : public State<Number> {

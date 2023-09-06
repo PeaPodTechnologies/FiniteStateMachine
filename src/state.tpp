@@ -40,10 +40,12 @@ template <typename T> void State<T>::set(const T& val) {
     DEBUG_DELAY();
   #endif
 
-  for(unsigned int i = 0; i < MAX_CONDITIONALS; i++) {
-    if(this->conditionals[i] == nullptr) break;
+  if(!this->disabled) {
+    for(unsigned int i = 0; i < MAX_CONDITIONALS; i++) {
+      if(this->conditionals[i] == nullptr) break;
 
-    this->conditionals[i]->operator()(val);
+      this->conditionals[i]->operator()(val);
+    }
   }
 
   #ifdef DEBUG
@@ -89,6 +91,14 @@ template <typename T> ConditionalCallback<T>* State<T>::addLatchingConditional(c
 template <typename T> ConditionalCallback<T>* State<T>::addLatchingConditional(const T& on, const T& off, typename ConditionalCallback<T>::cb_compval_t cb) { return addLatchingConditional(on, off, (const void*)cb, CB_COMPVAL); }
 
 template <typename T> ConditionalCallback<T>* State<T>::addLatchingConditional(const T& on, const T& off, typename ConditionalCallback<T>::cb_compvalref_t cb) { return addLatchingConditional(on, off, (const void*)cb, CB_COMPVALREF); }
+
+template <typename T> bool State<T>::isDisabled() { return this->disabled; }
+template <typename T> void State<T>::enable() { this->disabled = false; }
+template <typename T> void State<T>::enable(const T& val) { this->disabled = false; this->set(val); }
+template <typename T> void State<T>::disable() { this->disabled = true; }
+template <typename T> void State<T>::disable(const T& val) { this->set(val); this->disabled = true; }
+template <typename T> void State<T>::resume() { this->disabled = false; this->set(this->value); }
+
 
 #endif
 #endif
