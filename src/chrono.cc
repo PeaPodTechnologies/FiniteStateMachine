@@ -1,11 +1,11 @@
-#include <timer.h>
+#include <chrono.h>
 
 #include <debug.h>
 
 #include <state.h>
 #include <comparators.h>
 
-_Timer Timer = _Timer();
+Chronograph Chronos = Chronograph();
 
 #ifdef DEBUG
 // Helper
@@ -13,11 +13,11 @@ void debugTimestamp(const fsm_timestamp_t& timestamp);
 
 #endif
 
-Interval::Interval(const fsm_timestamp_t& delta, const void* cb, callback_type_t cbtype, bool invert) : now(delta), delta(delta), ConditionalCallback<fsm_timestamp_t>(CMP_GTR, delta, cb, cbtype, invert) { }
+IntervalCallback::IntervalCallback(const fsm_timestamp_t& delta, const void* cb, callback_type_t cbtype, bool invert) : now(delta), delta(delta), ConditionalCallback<fsm_timestamp_t>(CMP_GTR, delta, cb, cbtype, invert) { }
 
-Interval::Interval(const fsm_timestamp_t& delta, const fsm_timestamp_t& phase, const void* cb, callback_type_t cbtype, bool invert) : now(delta), delta(delta), phase(phase % delta), ConditionalCallback<fsm_timestamp_t>(CMP_GTR, delta, cb, cbtype, invert) { }
+IntervalCallback::IntervalCallback(const fsm_timestamp_t& delta, const fsm_timestamp_t& phase, const void* cb, callback_type_t cbtype, bool invert) : now(delta), delta(delta), phase(phase % delta), ConditionalCallback<fsm_timestamp_t>(CMP_GTR, delta, cb, cbtype, invert) { }
 
-const fsm_timestamp_t& Interval::childReference(const fsm_timestamp_t& val) {
+const fsm_timestamp_t& IntervalCallback::childReference(const fsm_timestamp_t& val) {
   // If the new value is way over the line, modulus and set now
   if(val > (this->delta + this->phase)) {
     this->now = val % this->delta; // leaves phase in
@@ -34,9 +34,9 @@ const fsm_timestamp_t& Interval::childReference(const fsm_timestamp_t& val) {
   return (refholder = (this->delta + this->phase));
 }
 
-fsm_timestamp_t Interval::get(void) { return this->now; }
+fsm_timestamp_t IntervalCallback::get(void) { return this->now; }
 
-void Interval::set(const fsm_timestamp_t& val) {
+void IntervalCallback::set(const fsm_timestamp_t& val) {
   this->now = val;
   #ifdef DEBUG
     DEBUG_DELAY();
@@ -48,9 +48,9 @@ void Interval::set(const fsm_timestamp_t& val) {
   this->operator()(this->now); 
 }
 
-FlagInterval::FlagInterval(const fsm_timestamp_t& delta, Flag* flag, bool invert) : flag(flag), Interval(delta, nullptr, CB_NONE, invert) { }
+FlagInterval::FlagInterval(const fsm_timestamp_t& delta, Flag* flag, bool invert) : flag(flag), IntervalCallback(delta, nullptr, CB_NONE, invert) { }
 
-FlagInterval::FlagInterval(const fsm_timestamp_t& delta, const fsm_timestamp_t& phase, Flag* flag, bool invert) : flag(flag), Interval(delta, phase, nullptr, CB_NONE, invert) { }
+FlagInterval::FlagInterval(const fsm_timestamp_t& delta, const fsm_timestamp_t& phase, Flag* flag, bool invert) : flag(flag), IntervalCallback(delta, phase, nullptr, CB_NONE, invert) { }
 
 void FlagInterval::childCallback(bool comp, const fsm_timestamp_t& val, const fsm_timestamp_t& ref) {
   #ifdef DEBUG
@@ -63,9 +63,9 @@ void FlagInterval::childCallback(bool comp, const fsm_timestamp_t& val, const fs
   this->flag->set(comp);
 }
 
-Event::Event(const fsm_timestamp_t& timestamp, typename ConditionalCallback<fsm_timestamp_t>::cb_compval_t cb, bool invert) : ConditionalCallback<fsm_timestamp_t>(CMP_GEQ, timestamp, cb, invert) { }
+ChronoEvent::ChronoEvent(const fsm_timestamp_t& timestamp, typename ConditionalCallback<fsm_timestamp_t>::cb_compval_t cb, bool invert) : ConditionalCallback<fsm_timestamp_t>(CMP_GEQ, timestamp, cb, invert) { }
 
-void Event::callOperator(const fsm_timestamp_t& val, const fsm_timestamp_t& ref) {
+void ChronoEvent::callOperator(const fsm_timestamp_t& val, const fsm_timestamp_t& ref) {
   bool result = compare(this->comparator, val, ref);
   if(!this->triggered && result) {
     this->triggered = true;
@@ -105,14 +105,14 @@ void FlagEvent::childCallback(bool comp, const fsm_timestamp_t& val, const fsm_t
   this->flag->set(comp);
 }
 
-_Timer::_Timer(const fsm_timestamp_t& start) : start(start), last(start), State<fsm_timestamp_t>(start) { 
+Chronograph::Chronograph(const fsm_timestamp_t& start) : start(start), last(start), State<fsm_timestamp_t>(start) { 
   // Blank it
   for(int i = 0; i < MAX_INTERVALS; i++) {
     this->intervals[i] = nullptr;
   }
 }
 
-void _Timer::set(const fsm_timestamp_t& _val) {
+void Chronograph::set(const fsm_timestamp_t& _val) {
   fsm_timestamp_t val = _val % TWENTYFOURHRS_MILLIS;
 
   const fsm_timestamp_t last = this->get();
@@ -139,17 +139,17 @@ void _Timer::set(const fsm_timestamp_t& _val) {
   }
 }
 
-fsm_timestamp_t _Timer::get(void) { return ((State<fsm_timestamp_t>*)this)->get(); }
+fsm_timestamp_t Chronograph::get(void) { return ((State<fsm_timestamp_t>*)this)->get(); }
 
-ConditionalCallback<fsm_timestamp_t>* _Timer::addEvent(const fsm_timestamp_t& timestamp, typename ConditionalCallback<fsm_timestamp_t>::cb_compval_t cb, bool invert) { return addConditional(new Event(timestamp, cb, invert)); }
+ConditionalCallback<fsm_timestamp_t>* Chronograph::addEvent(const fsm_timestamp_t& timestamp, typename ConditionalCallback<fsm_timestamp_t>::cb_compval_t cb, bool invert) { return addConditional(new ChronoEvent(timestamp, cb, invert)); }
 
-ConditionalCallback<fsm_timestamp_t>* _Timer::addEventFlag(const fsm_timestamp_t& timestamp, Flag* flag, bool invert) { return addConditional(new FlagEvent(timestamp, flag, invert)); }  
+ConditionalCallback<fsm_timestamp_t>* Chronograph::addEventFlag(const fsm_timestamp_t& timestamp, Flag* flag, bool invert) { return addConditional(new FlagEvent(timestamp, flag, invert)); }  
 
-Interval* _Timer::addInterval(const fsm_timestamp_t& delta, typename ConditionalCallback<fsm_timestamp_t>::cb_compval_t cb, bool invert) { 
+IntervalCallback* Chronograph::addInterval(const fsm_timestamp_t& delta, typename ConditionalCallback<fsm_timestamp_t>::cb_compval_t cb, bool invert) { 
   return this->addInterval(delta, 0, cb, invert);
 }
 
-Interval* _Timer::addInterval(const fsm_timestamp_t& delta, const fsm_timestamp_t& phase, typename ConditionalCallback<fsm_timestamp_t>::cb_compval_t cb, bool invert) { 
+IntervalCallback* Chronograph::addInterval(const fsm_timestamp_t& delta, const fsm_timestamp_t& phase, typename ConditionalCallback<fsm_timestamp_t>::cb_compval_t cb, bool invert) { 
   unsigned int n = 0;
   while(intervals[n] != nullptr) { n++; if(n > MAX_INTERVALS) return nullptr;}
 
@@ -165,11 +165,11 @@ Interval* _Timer::addInterval(const fsm_timestamp_t& delta, const fsm_timestamp_
     DEBUG_DELAY();
   #endif
 
-  intervals[n] = new Interval(delta, phase, (const void*)cb, CB_COMPVAL, invert);
+  intervals[n] = new IntervalCallback(delta, phase, (const void*)cb, CB_COMPVAL, invert);
   return intervals[n];
 }
 
-Interval* _Timer::addIntervalFlag(const fsm_timestamp_t& delta, const fsm_timestamp_t& phase, Flag* flag, bool invert) { 
+IntervalCallback* Chronograph::addIntervalFlag(const fsm_timestamp_t& delta, const fsm_timestamp_t& phase, Flag* flag, bool invert) { 
   unsigned int n = 0;
   while(intervals[n] != nullptr) { n++; if(n > MAX_INTERVALS) return nullptr;}
 
@@ -189,11 +189,11 @@ Interval* _Timer::addIntervalFlag(const fsm_timestamp_t& delta, const fsm_timest
   return intervals[n];
 }
 
-Interval* _Timer::addIntervalFlag(const fsm_timestamp_t& delta, Flag* flag, bool invert) { 
+IntervalCallback* Chronograph::addIntervalFlag(const fsm_timestamp_t& delta, Flag* flag, bool invert) { 
   return this->addIntervalFlag(delta, 0, flag, invert);
 }
 
-Interval* _Timer::addTwentyFourTimeout(const fsm_timestamp_t& phase, typename ConditionalCallback<fsm_timestamp_t>::cb_compval_t cb, bool invert) {
+IntervalCallback* Chronograph::addTwentyFourTimeout(const fsm_timestamp_t& phase, typename ConditionalCallback<fsm_timestamp_t>::cb_compval_t cb, bool invert) {
   unsigned int n = 0;
   while(intervals[n] != nullptr) { n++; if(n > MAX_INTERVALS) return nullptr;}
 
@@ -208,7 +208,7 @@ Interval* _Timer::addTwentyFourTimeout(const fsm_timestamp_t& phase, typename Co
     DEBUG_DELAY();
   #endif
 
-  intervals[n] = new Interval(TWENTYFOURHRS_MILLIS, phase, (const void*)cb, CB_COMPVAL, invert);
+  intervals[n] = new IntervalCallback(TWENTYFOURHRS_MILLIS, phase, (const void*)cb, CB_COMPVAL, invert);
   return intervals[n];
 }
 

@@ -3,7 +3,7 @@
 #include <Arduino.h>
 
 #include <debug.h>
-#include <timer.h>
+#include <chrono.h>
 
 // #include <avr/wdt.h>
 
@@ -69,23 +69,23 @@ void setup() {
   disco.addLatchingConditional(true, false, &controlDisco);
 
   // Timestamp output
-  Timer.addInterval(TIMESTAMP_LOG_DELTA_MS, &logTimestamp);
+  Chronos.addInterval(TIMESTAMP_LOG_DELTA_MS, &logTimestamp);
 
   // Timer Flag Event - Lighting ON (No-Invert)
-  Timer.addEventFlag(DELAY_START, &lighting);
+  Chronos.addEventFlag(DELAY_START, &lighting);
 
   // Timer Flag Event - Lighting OFF (Inverted)
-  Timer.addEventFlag(DELAY_START + DURATION_LIGHTING, &lighting, true);
+  Chronos.addEventFlag(DELAY_START + DURATION_LIGHTING, &lighting, true);
 
   // Timer Flag Interval - Watering ON (No-Invert)
-  Timer.addIntervalFlag(PERIOD_WATERING, &watering);
+  Chronos.addIntervalFlag(PERIOD_WATERING, &watering);
 
   // Timer Flag Interval - Watering OFF (Invert)
-  Timer.addIntervalFlag(PERIOD_WATERING, DURATION_WATERING, &watering, true);
+  Chronos.addIntervalFlag(PERIOD_WATERING, DURATION_WATERING, &watering, true);
 
   // Disco Scroller Callback - passes interval timestamp
   // discoScroller = 
-  Timer.addInterval(DELTA_DISCO, &scrollDisco);
+  Chronos.addInterval(DELTA_DISCO, &scrollDisco);
 
   // Disco Controller - Dis-/En-ables Disco Scroller Callback
 
@@ -104,7 +104,7 @@ void loop() {
   // Watchdog Timer Kickout
   if(now > TWENTYFOURHRS_MILLIS) { while(true) { delay(1); } }
 
-  Timer.set(now);
+  Chronos.set(now);
 
   // Other Stuff
 
@@ -115,7 +115,7 @@ void loop() {
 }
 
 void logTimestamp(bool _, const fsm_timestamp_t& __) {
-  fsm_timestamp_t timestamp = Timer.get();
+  fsm_timestamp_t timestamp = Chronos.get();
 
   DEBUG_DELAY();
   Serial.print("==== [ Time Elapsed: ");
@@ -198,7 +198,7 @@ void controlDisco(bool _, const bool& disco) {
 }
 
 void scrollDisco(bool _, const fsm_timestamp_t& __) {
-  fsm_timestamp_t timestamp = Timer.get();
+  fsm_timestamp_t timestamp = Chronos.get();
 
   uint8_t discoPWM = (uint8_t)((cos(((timestamp % DISCO_CYCLE_MS) / (float)DISCO_CYCLE_MS) * 6.2831853) / 2.25 + 0.5) * 255);
 
