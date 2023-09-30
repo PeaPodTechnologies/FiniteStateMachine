@@ -6,22 +6,22 @@
 #include <comparators.h>
 #include <number.h>
 
-#ifdef DEBUG
+#ifdef FSM_DEBUG_SERIAL
 
 template <> void stateDebug<Number>(const Number& val) {
   if(val.isNaN()) {
-    DEBUG.print("NaN");
+    FSM_DEBUG_SERIAL.print("NaN");
   } else {
-    DEBUG.print(val.operator double());
+    FSM_DEBUG_SERIAL.print(val.operator double());
   }
 }
 
 template <> void stateDebug<bool>(const bool& val) {
-  DEBUG.print(val ? "true" : "false");
+  FSM_DEBUG_SERIAL.print(val ? "true" : "false");
 }
 
 template <> void stateDebug<fsm_timestamp_t>(const fsm_timestamp_t& val) {
-  DEBUG.print(val);
+  FSM_DEBUG_SERIAL.print(val);
 }
 
 #endif

@@ -6,13 +6,13 @@
 #include <number.h>
 
 BangBangFlagSet::BangBangFlagSet(const Number& lo, const Number& hi, Flag* flag) : low(Number::minimum(lo, hi)), high(Number::maximum(lo, hi)), FlagSetCondition<Number>(CMP_LES, low, flag, (double)hi < (double)lo) {
-  #ifdef DEBUG
+  #ifdef FSM_DEBUG_SERIAL
     DEBUG_DELAY();
-    DEBUG.print("BangBang FlagSet [");
-    DEBUG.print((double)lo);
-    DEBUG.print(", ");
-    DEBUG.print((double)hi);
-    DEBUG.print("]\n");
+    FSM_DEBUG_SERIAL.print("BangBang FlagSet [");
+    FSM_DEBUG_SERIAL.print((double)lo);
+    FSM_DEBUG_SERIAL.print(", ");
+    FSM_DEBUG_SERIAL.print((double)hi);
+    FSM_DEBUG_SERIAL.print("]\n");
     DEBUG_DELAY();
   #endif
 }
@@ -20,14 +20,14 @@ BangBangFlagSet::BangBangFlagSet(const Number& lo, const Number& hi, Flag* flag)
 void BangBangFlagSet::childCallback(bool comp, const Number& val, const Number& ref) {
   this->state = (ref == this->high);
 
-  #ifdef DEBUG
+  #ifdef FSM_DEBUG_SERIAL
     if(state) {
       DEBUG_DELAY();
-      DEBUG.print("BangBang (High)\n");
+      FSM_DEBUG_SERIAL.print("BangBang (High)\n");
       DEBUG_DELAY();
     } else {
       DEBUG_DELAY();
-      DEBUG.print("BangBang (Low)\n");
+      FSM_DEBUG_SERIAL.print("BangBang (Low)\n");
       DEBUG_DELAY();
     }
   #endif
@@ -41,40 +41,40 @@ void BangBangFlagSet::childCallback(bool comp, const Number& val, const Number& 
   // comp = this->state ? comp : !comp;
   bool _  = !(this->invert ^ this->state);
 
-  #ifdef DEBUG
+  #ifdef FSM_DEBUG_SERIAL
     DEBUG_DELAY();
-    DEBUG.print("Flag Set (");
-    DEBUG.print(_ ? "true" : "false");
-    DEBUG.print(")\n");
+    FSM_DEBUG_SERIAL.print("Flag Set (");
+    FSM_DEBUG_SERIAL.print(_ ? "true" : "false");
+    FSM_DEBUG_SERIAL.print(")\n");
     DEBUG_DELAY();
   #endif
   this->flag->set(_);
 }
 
 const Number& BangBangFlagSet::childReference(const Number& val) {
-  #ifdef DEBUG
+  #ifdef FSM_DEBUG_SERIAL
     DEBUG_DELAY();
-    DEBUG.print("BangBang State: ");
-    DEBUG.print(BOOLSTR(this->state));
-    DEBUG.print("\n");
+    FSM_DEBUG_SERIAL.print("BangBang State: ");
+    FSM_DEBUG_SERIAL.print(BOOLSTR(this->state));
+    FSM_DEBUG_SERIAL.print("\n");
     DEBUG_DELAY();
   #endif
   if (this->state && val <= this->low) {
     this->setComparator(CMP_LES);
     this->triggered = false;
     this->state = false;
-    #ifdef DEBUG
+    #ifdef FSM_DEBUG_SERIAL
       DEBUG_DELAY();
-      DEBUG.print("BangBang State: Expecting Low\n");
+      FSM_DEBUG_SERIAL.print("BangBang State: Expecting Low\n");
       DEBUG_DELAY();
     #endif
   } else if (!this->state && val >= this->high) {
     this->setComparator(CMP_GTR);
     this->triggered = false;
     this->state = true;
-    #ifdef DEBUG
+    #ifdef FSM_DEBUG_SERIAL
       DEBUG_DELAY();
-      DEBUG.print("BangBang State: Expecting High\n");
+      FSM_DEBUG_SERIAL.print("BangBang State: Expecting High\n");
       DEBUG_DELAY();
     #endif
   }
@@ -88,9 +88,9 @@ void BangBangFlagSet::callOperator(const Number& val, const Number& ref) {
     this->executeCallback(val, ref);
   } else if(!result) {
     // Reset
-    #ifdef DEBUG
+    #ifdef FSM_DEBUG_SERIAL
       DEBUG_DELAY();
-      DEBUG.print("BangBang Trigger Reset!\n");
+      FSM_DEBUG_SERIAL.print("BangBang Trigger Reset!\n");
       DEBUG_DELAY();
     #endif
     this->triggered = false;
@@ -104,9 +104,9 @@ void LatchingFlagSet::callOperator(const bool& val, const bool& ref) {
     this->triggered = true;
   } else if(!result) {
     // Reset
-    #ifdef DEBUG
+    #ifdef FSM_DEBUG_SERIAL
       DEBUG_DELAY();
-      DEBUG.print("Trigger Reset!\n");
+      FSM_DEBUG_SERIAL.print("Trigger Reset!\n");
       DEBUG_DELAY();
     #endif
     this->triggered = false;
@@ -120,14 +120,14 @@ void LatchingFlagSet::childCallback(bool comp, const bool& val, const bool& ref)
   this->state = !ref;
   this->triggered = false;
 
-  #ifdef DEBUG
+  #ifdef FSM_DEBUG_SERIAL
     if(val) {
       DEBUG_DELAY();
-      DEBUG.print("Latch (High)\n");
+      FSM_DEBUG_SERIAL.print("Latch (High)\n");
       DEBUG_DELAY();
     } else {
       DEBUG_DELAY();
-      DEBUG.print("Latch (Low)\n");
+      FSM_DEBUG_SERIAL.print("Latch (Low)\n");
       DEBUG_DELAY();
     }
   #endif
@@ -135,11 +135,11 @@ void LatchingFlagSet::childCallback(bool comp, const bool& val, const bool& ref)
   bool _ = val ^ ref;
 
   // Cast void* cb fn pointer to appropriate type and call
-  #ifdef DEBUG
+  #ifdef FSM_DEBUG_SERIAL
     DEBUG_DELAY();
-    DEBUG.print("Flag Set (");
-    DEBUG.print(_ ? "true" : "false");
-    DEBUG.print(")\n");
+    FSM_DEBUG_SERIAL.print("Flag Set (");
+    FSM_DEBUG_SERIAL.print(_ ? "true" : "false");
+    FSM_DEBUG_SERIAL.print(")\n");
     DEBUG_DELAY();
   #endif
   this->flag->set(_);

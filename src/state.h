@@ -10,7 +10,7 @@ class Variable;
 
 #define MAX_CONDITIONALS 10
 
-#ifdef DEBUG
+#ifdef FSM_DEBUG_SERIAL
 
 template <typename T> void stateDebug(const T& val);
 

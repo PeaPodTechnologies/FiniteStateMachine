@@ -25,11 +25,11 @@ template <typename T> FlagSetCondition<T>::FlagSetCondition(comparators_t cmp, c
 template <typename T> FlagSetCondition<T>::FlagSetCondition(comparators_t cmp, const T& ref, Flag* flag, bool invert, typename ConditionalCallback<T>::cb_getref_t getReference) : flag(flag), ConditionalCallback<T>(cmp, ref, invert, getReference) { }
 
 template <typename T> void FlagSetCondition<T>::childCallback(bool comp, const T& val, const T& ref) {
-  #ifdef DEBUG
+  #ifdef FSM_DEBUG_SERIAL
     DEBUG_DELAY();
-    DEBUG.print("Flag Set (");
-    DEBUG.print(comp ? "true" : "false");
-    DEBUG.print(")\n");
+    FSM_DEBUG_SERIAL.print("Flag Set (");
+    FSM_DEBUG_SERIAL.print(comp ? "true" : "false");
+    FSM_DEBUG_SERIAL.print(")\n");
     DEBUG_DELAY();
   #endif
   this->flag->set(comp);
