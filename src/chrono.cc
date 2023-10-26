@@ -214,7 +214,7 @@ IntervalCallback* Chronograph::addTwentyFourTimeout(const fsm_timestamp_t& phase
 
 #ifdef FSM_DEBUG_SERIAL
 
-void debugTimestamp(const fsm_timestamp_t& timestamp) {
+void Chronograph::debugTimestamp(const fsm_timestamp_t& timestamp) {
   unsigned long seconds = timestamp / 1000;
   unsigned long res_ms = timestamp % 1000;
   unsigned long minutes = seconds / 60;
@@ -248,8 +248,6 @@ void debugTimestamp(const fsm_timestamp_t& timestamp) {
     FSM_DEBUG_SERIAL.print(res_ms);
     FSM_DEBUG_SERIAL.print("ms");
   }
-
-  FSM_DEBUG_SERIAL.print("\n");
   DEBUG_DELAY();
 }
 

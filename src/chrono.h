@@ -82,6 +82,10 @@ class Chronograph : private State<fsm_timestamp_t> {
     fsm_timestamp_t get(void);
 
     // ConditionalCallback<fsm_timestamp_t>* addLoggerCallback(void (*cb)(bool, fsm_timestamp_t));
+
+    #ifdef FSM_DEBUG_SERIAL
+      static void debugTimestamp(const fsm_timestamp_t& timestamp);
+    #endif
 };
 
 extern Chronograph Chronos;
