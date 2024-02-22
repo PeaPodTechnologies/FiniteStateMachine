@@ -27,7 +27,7 @@ template <typename T> FlagSetCondition<T>::FlagSetCondition(comparators_t cmp, c
 template <typename T> void FlagSetCondition<T>::childCallback(bool comp, const T& val, const T& ref) {
   #ifdef FSM_DEBUG_SERIAL
     DEBUG_DELAY();
-    FSM_DEBUG_SERIAL.print("Flag Set (");
+    FSM_DEBUG_SERIAL.print(_F("Flag Set ("));
     FSM_DEBUG_SERIAL.print(comp ? "true" : "false");
     FSM_DEBUG_SERIAL.print(")\n");
     DEBUG_DELAY();

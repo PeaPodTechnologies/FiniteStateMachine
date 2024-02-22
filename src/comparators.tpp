@@ -20,12 +20,12 @@
 template <typename T> ConditionalCallback<T>::ConditionalCallback(comparators_t cmp, const T& ref, const void* cb, callback_type_t cbtype, bool invert, cb_getref_t getReference) : comparator(cmp), reference(ref), callback(cb), callbacktype(cbtype), invert(invert), getReference(getReference) {
   #ifdef FSM_DEBUG_SERIAL
     DEBUG_DELAY();
-    FSM_DEBUG_SERIAL.print("Callback Created: X ");
+    FSM_DEBUG_SERIAL.print(_F("Callback Created: X "));
     FSM_DEBUG_SERIAL.print(parseComparator(cmp));
     FSM_DEBUG_SERIAL.print(" ");
     FSM_DEBUG_SERIAL.print(ref);
-    if(invert) FSM_DEBUG_SERIAL.print(" (Inverted) ");
-    if(getReference != nullptr) FSM_DEBUG_SERIAL.print(" (Dynamic Ref) ");
+    if(invert) FSM_DEBUG_SERIAL.print(_F(" (Inverted) "));
+    if(getReference != nullptr) FSM_DEBUG_SERIAL.print(_F(" (Dynamic Ref) "));
     FSM_DEBUG_SERIAL.print("\n");
     DEBUG_DELAY();
   #endif
@@ -44,11 +44,11 @@ template <typename T> ConditionalCallback<T>::ConditionalCallback(comparators_t 
 template <typename T> ConditionalCallback<T>::ConditionalCallback(comparators_t cmp, const T& ref, const void* cb, callback_type_t cbtype, cb_getref_t getReference) : comparator(cmp), reference(ref), callback(cb), callbacktype(cbtype), getReference(getReference) {
   #ifdef FSM_DEBUG_SERIAL
     DEBUG_DELAY();
-    FSM_DEBUG_SERIAL.print("Callback Created: X ");
+    FSM_DEBUG_SERIAL.print(_F("Callback Created: X "));
     FSM_DEBUG_SERIAL.print(parseComparator(cmp));
     FSM_DEBUG_SERIAL.print(" ");
     FSM_DEBUG_SERIAL.print(ref);
-    if(getReference != nullptr) FSM_DEBUG_SERIAL.print(" (Dynamic Ref) ");
+    if(getReference != nullptr) FSM_DEBUG_SERIAL.print(_F(" (Dynamic Ref) "));
     FSM_DEBUG_SERIAL.print("\n");
     DEBUG_DELAY();
   #endif
@@ -77,7 +77,7 @@ template <typename T> void ConditionalCallback<T>::operator()(const T& val) {
     this->reference = this->getReference(val);
     #ifdef FSM_DEBUG_SERIAL
       DEBUG_DELAY();
-      FSM_DEBUG_SERIAL.print("Got Reference: ");
+      FSM_DEBUG_SERIAL.print(_F("Got Reference: "));
       FSM_DEBUG_SERIAL.print(this->reference);
       FSM_DEBUG_SERIAL.print("\n");
       DEBUG_DELAY();
@@ -86,7 +86,7 @@ template <typename T> void ConditionalCallback<T>::operator()(const T& val) {
     this->reference = this->childReference(val);
     #ifdef FSM_DEBUG_SERIAL
       DEBUG_DELAY();
-      FSM_DEBUG_SERIAL.print("Got Child Reference: ");
+      FSM_DEBUG_SERIAL.print(_F("Got Child Reference: "));
       FSM_DEBUG_SERIAL.print(this->reference);
       FSM_DEBUG_SERIAL.print("\n");
       DEBUG_DELAY();
@@ -100,7 +100,7 @@ template <typename T> void ConditionalCallback<T>::operator()(const T& val, cons
 template <typename T> void ConditionalCallback<T>::setComparator(comparators_t cmp) {
   #ifdef FSM_DEBUG_SERIAL
     DEBUG_DELAY();
-    FSM_DEBUG_SERIAL.print("Comparator Change: ");
+    FSM_DEBUG_SERIAL.print(_F("Comparator Change: "));
     FSM_DEBUG_SERIAL.print(parseComparator(cmp));
     FSM_DEBUG_SERIAL.print("\n");
     DEBUG_DELAY();
@@ -117,7 +117,7 @@ template <typename T> void ConditionalCallback<T>::callOperator(const T& val, co
 template <typename T> void ConditionalCallback<T>::executeCallback(const T& val, const T& ref) {
   #ifdef FSM_DEBUG_SERIAL
     DEBUG_DELAY();
-    FSM_DEBUG_SERIAL.print(invert ? "Callback! (Inverted)" : "Callback!");
+    FSM_DEBUG_SERIAL.print(invert ? _F("Callback! (Inverted)") : _F("Callback!"));
     FSM_DEBUG_SERIAL.print("\n");
     DEBUG_DELAY();
   #endif
@@ -136,7 +136,7 @@ template <typename T> void ConditionalCallback<T>::executeCallback(const T& val,
     // Assumes childCallback
     #ifdef FSM_DEBUG_SERIAL
       DEBUG_DELAY();
-      FSM_DEBUG_SERIAL.print("No Callback - Calling Child: ");
+      FSM_DEBUG_SERIAL.print(_F("No Callback - Calling Child: "));
       DEBUG_DELAY();
     #endif
     this->childCallback(_, val, ref);

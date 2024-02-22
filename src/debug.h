@@ -23,4 +23,11 @@
 #endif
 #endif
 
+// #define DEBUG_DISABLE_FSTRINGS 1
+#ifdef DEBUG_DISABLE_FSTRINGS
+#define _F(x) x
+#else
+#define _F(x) F(x)
+#endif
+
 #endif

@@ -24,7 +24,7 @@ const fsm_timestamp_t& IntervalCallback::childReference(const fsm_timestamp_t& v
 
     #ifdef FSM_DEBUG_SERIAL
       DEBUG_DELAY();
-      FSM_DEBUG_SERIAL.print("Interval Reset!\n");
+      FSM_DEBUG_SERIAL.print(_F("Interval Reset!\n"));
       DEBUG_DELAY();
     #endif // DEBUG
 
@@ -40,9 +40,9 @@ void IntervalCallback::set(const fsm_timestamp_t& val) {
   this->now = val;
   #ifdef FSM_DEBUG_SERIAL
     DEBUG_DELAY();
-    FSM_DEBUG_SERIAL.print("Interval Set (");
+    FSM_DEBUG_SERIAL.print(_F("Interval Set ("));
     FSM_DEBUG_SERIAL.print(this->now);
-    FSM_DEBUG_SERIAL.print("ms)\n");
+    FSM_DEBUG_SERIAL.print(_F("ms)\n"));
     DEBUG_DELAY();
   #endif // DEBUG
   this->operator()(this->now); 
@@ -55,7 +55,7 @@ FlagInterval::FlagInterval(const fsm_timestamp_t& delta, const fsm_timestamp_t& 
 void FlagInterval::childCallback(bool comp, const fsm_timestamp_t& val, const fsm_timestamp_t& ref) {
   #ifdef FSM_DEBUG_SERIAL
     DEBUG_DELAY();
-    FSM_DEBUG_SERIAL.print("Flag Interval Set (");
+    FSM_DEBUG_SERIAL.print(_F("Flag Interval Set ("));
     FSM_DEBUG_SERIAL.print(comp ? "true" : "false");
     FSM_DEBUG_SERIAL.print(")\n");
     DEBUG_DELAY();
@@ -72,7 +72,7 @@ void ChronoEvent::callOperator(const fsm_timestamp_t& val, const fsm_timestamp_t
 
     #ifdef FSM_DEBUG_SERIAL
       DEBUG_DELAY();
-      FSM_DEBUG_SERIAL.print("Event Triggered!\n");
+      FSM_DEBUG_SERIAL.print(_F("Event Triggered!\n"));
       DEBUG_DELAY();
     #endif // DEBUG
 
@@ -96,7 +96,7 @@ void FlagEvent::callOperator(const fsm_timestamp_t& val, const fsm_timestamp_t& 
 void FlagEvent::childCallback(bool comp, const fsm_timestamp_t& val, const fsm_timestamp_t& ref) {
   #ifdef FSM_DEBUG_SERIAL
     DEBUG_DELAY();
-    FSM_DEBUG_SERIAL.print("Flag Event Set (");
+    FSM_DEBUG_SERIAL.print(_F("Flag Event Set ("));
     FSM_DEBUG_SERIAL.print(comp ? "true" : "false");
     FSM_DEBUG_SERIAL.print(")\n");
     DEBUG_DELAY();
@@ -122,7 +122,7 @@ void Chronograph::set(const fsm_timestamp_t& _val) {
   
   #ifdef FSM_DEBUG_SERIAL
     DEBUG_DELAY();
-    FSM_DEBUG_SERIAL.print("Timer Delta: ");
+    FSM_DEBUG_SERIAL.print(_F("Timer Delta: "));
     debugTimestamp(delta);
     FSM_DEBUG_SERIAL.print("\n");
     DEBUG_DELAY();
@@ -155,7 +155,7 @@ IntervalCallback* Chronograph::addInterval(const fsm_timestamp_t& delta, const f
 
   #ifdef FSM_DEBUG_SERIAL
     DEBUG_DELAY();
-    FSM_DEBUG_SERIAL.print("New Interval (");
+    FSM_DEBUG_SERIAL.print(_F("New Interval ("));
     FSM_DEBUG_SERIAL.print(delta);
     if(phase > 0) {
       FSM_DEBUG_SERIAL.print("+");
@@ -175,7 +175,7 @@ IntervalCallback* Chronograph::addIntervalFlag(const fsm_timestamp_t& delta, con
 
   #ifdef FSM_DEBUG_SERIAL
     DEBUG_DELAY();
-    FSM_DEBUG_SERIAL.print("New Interval Flag (");
+    FSM_DEBUG_SERIAL.print(_F("New Interval Flag ("));
     FSM_DEBUG_SERIAL.print(delta);
     if(phase > 0) {
       FSM_DEBUG_SERIAL.print("+");
@@ -199,7 +199,7 @@ IntervalCallback* Chronograph::addTwentyFourTimeout(const fsm_timestamp_t& phase
 
   #ifdef FSM_DEBUG_SERIAL
     DEBUG_DELAY();
-    FSM_DEBUG_SERIAL.print("New 24Hr Interval Flag");
+    FSM_DEBUG_SERIAL.print(_F("New 24Hr Interval Flag"));
     if(phase > 0) {
       FSM_DEBUG_SERIAL.print("(+");
       FSM_DEBUG_SERIAL.print(phase);

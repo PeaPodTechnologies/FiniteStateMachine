@@ -28,14 +28,14 @@ template <typename T> void State<T>::set(const T& val) {
   #ifdef FSM_DEBUG_SERIAL
     DEBUG_DELAY();
     if(this->key == nullptr) {
-      FSM_DEBUG_SERIAL.print("State Set: ");
+      FSM_DEBUG_SERIAL.print(_F("State Set: "));
     } else {
       FSM_DEBUG_SERIAL.print(this->key);
-      FSM_DEBUG_SERIAL.print(" Set: ");
+      FSM_DEBUG_SERIAL.print(_F(" Set: "));
     }
     stateDebug<T>(val);
     FSM_DEBUG_SERIAL.print("\n");
-    FSM_DEBUG_SERIAL.print("==== [ Conditionals ] ====");
+    FSM_DEBUG_SERIAL.print(_F("==== [ Conditionals ] ===="));
     FSM_DEBUG_SERIAL.print("\n");
     DEBUG_DELAY();
   #endif
@@ -50,12 +50,12 @@ template <typename T> void State<T>::set(const T& val) {
 
   #ifdef FSM_DEBUG_SERIAL
     DEBUG_DELAY();
-    FSM_DEBUG_SERIAL.print("==== [ End of Conditionals");
+    FSM_DEBUG_SERIAL.print(_F("==== [ End of Conditionals"));
     if(this->key != nullptr) {
       FSM_DEBUG_SERIAL.print(": ");
       FSM_DEBUG_SERIAL.print(this->key);
     }
-    FSM_DEBUG_SERIAL.print(" ] ====\n");
+    FSM_DEBUG_SERIAL.print(_F(" ] ====\n"));
     DEBUG_DELAY();
   #endif
 

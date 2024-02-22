@@ -33,7 +33,7 @@ template <> bool ConditionalCallback<bool>::compare(comparators_t cmp, const boo
   }
   #ifdef FSM_DEBUG_SERIAL
     DEBUG_DELAY();
-    FSM_DEBUG_SERIAL.print("Flag (");
+    FSM_DEBUG_SERIAL.print(_F("Flag ("));
     FSM_DEBUG_SERIAL.print(BOOLSTR(val));
     FSM_DEBUG_SERIAL.print(" | ");
     FSM_DEBUG_SERIAL.print((int)ival);
@@ -53,7 +53,7 @@ template <> bool ConditionalCallback<Number>::compare(comparators_t cmp, const N
   if(ref.isNaN()) {
     #ifdef FSM_DEBUG_SERIAL
       DEBUG_DELAY();
-      FSM_DEBUG_SERIAL.print("[Variable Ref NaN - Always True]\n");
+      FSM_DEBUG_SERIAL.print(_F("[Variable Ref NaN - Always True]\n"));
       DEBUG_DELAY();
     #endif
     return true;
@@ -85,11 +85,11 @@ template <> bool ConditionalCallback<Number>::compare(comparators_t cmp, const N
   }
   #ifdef FSM_DEBUG_SERIAL
     DEBUG_DELAY();
-    FSM_DEBUG_SERIAL.print("Variable (");
+    FSM_DEBUG_SERIAL.print(_F("Variable ("));
     FSM_DEBUG_SERIAL.print((double)val);
     FSM_DEBUG_SERIAL.print(") ");
     FSM_DEBUG_SERIAL.print(parseComparator(cmp, result));
-    FSM_DEBUG_SERIAL.print(" Ref (");
+    FSM_DEBUG_SERIAL.print(_F(" Ref ("));
     FSM_DEBUG_SERIAL.print((double)ref);
     FSM_DEBUG_SERIAL.print(")\n");
     DEBUG_DELAY();
@@ -104,7 +104,7 @@ template <> bool ConditionalCallback<fsm_timestamp_t>::compare(comparators_t cmp
 BangBangConditional::BangBangConditional(const Number& lo, const Number& hi, const void* rising, const void* falling, callback_type_t cbtype) : low(Number::minimum(lo, hi)), high(Number::maximum(lo, hi)), rising(rising), falling(falling), latchcbtype(cbtype), ConditionalCallback<Number>(CMP_LES, low, (double)hi < (double)lo) { 
   #ifdef FSM_DEBUG_SERIAL
     DEBUG_DELAY();
-    FSM_DEBUG_SERIAL.print("BangBang [");
+    FSM_DEBUG_SERIAL.print(_F("BangBang ["));
     FSM_DEBUG_SERIAL.print((double)lo);
     FSM_DEBUG_SERIAL.print(", ");
     FSM_DEBUG_SERIAL.print((double)hi);
@@ -126,11 +126,11 @@ void BangBangConditional::childCallback(bool comp, const Number& val, const Numb
   #ifdef FSM_DEBUG_SERIAL
     if(this->state) {
       DEBUG_DELAY();
-      FSM_DEBUG_SERIAL.print("BangBang (High)\n");
+      FSM_DEBUG_SERIAL.print(_F("BangBang (High)\n"));
       DEBUG_DELAY();
     } else {
       DEBUG_DELAY();
-      FSM_DEBUG_SERIAL.print("BangBang (Low)\n");
+      FSM_DEBUG_SERIAL.print(_F("BangBang (Low)\n"));
       DEBUG_DELAY();
     }
   #endif
@@ -182,7 +182,7 @@ void BangBangConditional::callOperator(const Number& val, const Number& ref) {
   if(!this->triggered && result) {
     #ifdef FSM_DEBUG_SERIAL
       DEBUG_DELAY();
-      FSM_DEBUG_SERIAL.print("BangBang Triggered\n");
+      FSM_DEBUG_SERIAL.print(_F("BangBang Triggered\n"));
       DEBUG_DELAY();
     #endif
     this->triggered = true;
@@ -191,7 +191,7 @@ void BangBangConditional::callOperator(const Number& val, const Number& ref) {
     // Reset
     #ifdef FSM_DEBUG_SERIAL
       DEBUG_DELAY();
-      FSM_DEBUG_SERIAL.print("BangBang Trigger Reset!\n");
+      FSM_DEBUG_SERIAL.print(_F("BangBang Trigger Reset!\n"));
       DEBUG_DELAY();
     #endif
     this->triggered = false;
@@ -211,7 +211,7 @@ void LatchingConditional::callOperator(const bool& val, const bool& ref) {
   #ifdef FSM_DEBUG_SERIAL
     if(!result && this->triggered) {
       DEBUG_DELAY();
-      FSM_DEBUG_SERIAL.print("Trigger Reset!\n");
+      FSM_DEBUG_SERIAL.print(_F("Trigger Reset!\n"));
       DEBUG_DELAY();
     }
   #endif
@@ -232,11 +232,11 @@ void LatchingConditional::childCallback(bool comp, const bool& val, const bool& 
   #ifdef FSM_DEBUG_SERIAL
     if(val) {
       DEBUG_DELAY();
-      FSM_DEBUG_SERIAL.print("Latch Set (true)\n");
+      FSM_DEBUG_SERIAL.print(_F("Latch Set (true)\n"));
       DEBUG_DELAY();
     } else {
       DEBUG_DELAY();
-      FSM_DEBUG_SERIAL.print("Latch Reset (false)\n");
+      FSM_DEBUG_SERIAL.print(_F("Latch Reset (false)\n"));
       DEBUG_DELAY();
     }
   #endif
