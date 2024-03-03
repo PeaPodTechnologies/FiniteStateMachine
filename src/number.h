@@ -3,9 +3,13 @@
 
 #define NUMBER_FLOP_EPSILON 0.00001
 
-#include <math.h>
+#include <Arduino.h>
+
+// Timestamps are numbers too :)
 
 typedef unsigned long fsm_timestamp_t;
+
+String timestampToString(const fsm_timestamp_t& val);
 
 class Number {
   private:
@@ -69,6 +73,8 @@ class Number {
     static const Number& minimum(const Number& a, const Number& b);
 
     static const Number& maximum(const Number& a, const Number& b);
+
+    String toString(uint8_t floating = 2) const;
 };
 
 #endif

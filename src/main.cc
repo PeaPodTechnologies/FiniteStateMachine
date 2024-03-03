@@ -5,15 +5,16 @@
 #include <debug.h>
 #include <chrono.h>
 
-// #include <avr/wdt.h>
+#include <avr/wdt.h>
 
 #define TIMESTAMP_LOG_DELTA_MS 5000 // Default
+#define FSM_CYCLE_DELTA_MS     100
 
 // Watering
 
 #define PIN_WATERING        2
 #define DURATION_WATERING   2000     // 10 seconds
-#define PERIOD_WATERING  200000   // 30 minutes
+#define PERIOD_WATERING  10000   // 30 minutes
 
 // Lighting
 
@@ -34,10 +35,9 @@
 // #define DELAY_PHOTO_FLASH   // 
 // #define PERIOD_LIGHTING
 
+void logCycle(bool _, const Number& cycle);
 void logTimestamp(bool _, const fsm_timestamp_t& timestamp);
-void logLights(bool _, const bool& on);
-void logWatering(bool _, const bool& on);
-void logDisco(bool _, const bool& on);
+// void logDisco(bool _, const bool& on);
 
 // void timerControlLights(bool on, const fsm_timestamp_t& timestamp);
 void controlLights(bool _, const bool& lights);
@@ -46,9 +46,8 @@ void controlDisco(bool _, const bool& __);
 
 void scrollDisco(bool _, const fsm_timestamp_t& __);
 
-Flag lighting = Flag();
-Flag watering = Flag();
-Flag disco = Flag();
+Variable* cycle;
+Flag* lighting, *watering, *disco;
 
 void setup() {
   // Serial
@@ -61,34 +60,39 @@ void setup() {
   pinMode(PIN_WATERING, OUTPUT);
   pinMode(PIN_DISCO_BUTTON, INPUT);
 
-  lighting.addLoggerCallback(&logLights);
-  watering.addLoggerCallback(&logWatering);
+  // Construct States
+  cycle = new Variable(Number(0, false, false), "Cycle");
+  cycle->addLoggerCallback(logCycle);
 
-  lighting.addLatchingConditional(true, false, &controlLights);
-  watering.addLatchingConditional(true, false, &controlWatering);
-  disco.addLatchingConditional(true, false, &controlDisco);
+  // Chronos.addInterval(TIMESTAMP_LOG_DELTA_MS, &logTimestamp);
 
-  // Timestamp output
-  Chronos.addInterval(TIMESTAMP_LOG_DELTA_MS, &logTimestamp);
+  lighting = new Flag(false, "Light");
+  lighting->addLatchingConditional(true, false, controlLights);
 
   // Timer Flag Event - Lighting ON (No-Invert)
-  Chronos.addEventFlag(DELAY_START, &lighting);
+  Chronos.addEventFlag(DELAY_START, lighting);
 
   // Timer Flag Event - Lighting OFF (Inverted)
-  Chronos.addEventFlag(DELAY_START + DURATION_LIGHTING, &lighting, true);
+  Chronos.addEventFlag(DELAY_START + DURATION_LIGHTING, lighting, true);
+
+  watering = new Flag(false, "Water");
+  watering->addLatchingConditional(true, false, controlWatering);
 
   // Timer Flag Interval - Watering ON (No-Invert)
-  Chronos.addIntervalFlag(PERIOD_WATERING, &watering);
+  Chronos.addIntervalFlag(PERIOD_WATERING, watering);
 
   // Timer Flag Interval - Watering OFF (Invert)
-  Chronos.addIntervalFlag(PERIOD_WATERING, DURATION_WATERING, &watering, true);
+  Chronos.addIntervalFlag(PERIOD_WATERING, DURATION_WATERING, watering, true);
+
+  disco = new Flag(false, "Disco");
+  disco->addLatchingConditional(true, false, &controlDisco);
 
   // Disco Scroller Callback - passes interval timestamp
-  // discoScroller = 
+  // discoScroller = s
   Chronos.addInterval(DELTA_DISCO, &scrollDisco);
 
-  // Disco Controller - Dis-/En-ables Disco Scroller Callback
-
+  // DebugJson::debugSRAM();
+  
   #ifdef _AVR_WDT_H_
     wdt_enable(WDTO_4S);
   #endif
@@ -99,75 +103,50 @@ void loop() {
     wdt_reset();
   #endif
 
-  fsm_timestamp_t now = millis();
+  cycle->set(cycle->get() + Number(1, false, false));
 
   // Watchdog Timer Kickout
-  if(now > TWENTYFOURHRS_MILLIS) { while(true) { delay(1); } }
+  // if(now > TWENTYFOURHRS_MILLIS) { while(true) { delay(1); } }
 
-  Chronos.set(now);
+  Chronos.set(millis());
 
   // Other Stuff
 
   int discoPin = digitalRead(PIN_DISCO_BUTTON);
-  disco.set(discoPin == HIGH ? true : false);
-
-  delay(10);
+  disco->set(discoPin == HIGH ? true : false);
 }
 
-void logTimestamp(bool _, const fsm_timestamp_t& __) {
-  fsm_timestamp_t timestamp = Chronos.get();
+unsigned long lastCycle = 0;
 
-  DEBUG_DELAY();
-  Serial.print("==== [ Time Elapsed: ");
-  unsigned long seconds = timestamp / 1000;
-  unsigned long minutes = seconds / 60;
-  unsigned long hours = minutes / 60;
+void logCycle(bool _, const Number& cycle) {
+  String m = _F("==== [ Cycle: ");
+  m += cycle.toString();
+  m += _F(" @ ");
+  m += timestampToString(millis());
 
-  seconds -= minutes * 60;
-  minutes -= hours * 60;
-
-  if(hours < 10) Serial.print("0");
-  Serial.print(hours);
-  Serial.print("h : ");
-  if(minutes < 10) Serial.print("0");
-  Serial.print(minutes - hours * 60);
-  Serial.print("m : ");
-  if(seconds < 10) Serial.print("0");
-  Serial.print(seconds);
-  Serial.println("s ] ====");
-  DEBUG_DELAY();
-}
-
-void logLights(bool _, const bool& on) {
-  const char* buf = (on ? "== [ Lights: ON ] ==" : "== [ Lights: OFF ] ==");
-  DEBUG_DELAY();
-  Serial.println(buf);
-  DEBUG_DELAY();
-}
-
-void logWatering(bool _, const bool& on) {
-  const char* buf = (on ? "== [ Watering: ON ] ==" : "== [ Watering: OFF ] ==");
-  DEBUG_DELAY();
-  Serial.println(buf);
-  DEBUG_DELAY();
-}
-
-void logDisco(bool _, const bool& on) {
-  const char* buf = (on ? "== [ Disco: ON ] ==" : "== [ Disco: OFF ] ==");
-  DEBUG_DELAY();
-  Serial.println(buf);
-  DEBUG_DELAY();
-}
-
-void timerControlLights(bool on, const fsm_timestamp_t& timestamp) {
-  if(on) {
-    analogWrite(PIN_LIGHTING_HI, PWM_LIGHTING_HI);
-    analogWrite(PIN_LIGHTING_LO, PWM_LIGHTING_LO);
-  } else {
-    analogWrite(PIN_LIGHTING_HI, LOW);
-    analogWrite(PIN_LIGHTING_LO, LOW);
+  unsigned delta = millis() - lastCycle;
+  unsigned d = 0;
+  if(delta < FSM_CYCLE_DELTA_MS) {
+    d = FSM_CYCLE_DELTA_MS - delta;
+    delay(d);
   }
+  if(d > 0) {
+    m += _F(" + ");
+    m += d;
+    m += _F("ms");
+  }
+  m += _F(" ] ====");
+
+  DebugJson::debug(m);
 }
+
+// void logDisco(bool _, const bool& on) {
+//   String m = _F("==== [ Disco: ");
+//   m += on ? _F("ENABLED") : _F("DISABLED");
+//   m += _F(" ] ====");
+//   // DEBUG_JSON(m.c_str(), m.length());
+// DEBUG_JSON(m);
+// }
 
 void controlLights(bool _, const bool& lights) {
   if(lights) {
@@ -177,6 +156,11 @@ void controlLights(bool _, const bool& lights) {
     analogWrite(PIN_LIGHTING_HI, LOW);
     analogWrite(PIN_LIGHTING_LO, LOW);
   }
+  String m = _F("==== [ Lights: ");
+  m += lights ? _F("ON") : _F("OFF");
+  m += _F(" ] ====");
+  DebugJson::debug(DebugJson::EVENT_TELEMETRY, m);
+  // Serial.println(m);
 }
 
 void controlWatering(bool _, const bool& watering) {
@@ -185,15 +169,24 @@ void controlWatering(bool _, const bool& watering) {
   } else {
     digitalWrite(PIN_WATERING, LOW);
   }
+  String m = _F("==== [ Watering: ");
+  m += watering ? _F("ON") : _F("OFF");
+  m += _F(" ] ====");
+  DebugJson::debug(DebugJson::EVENT_TELEMETRY, m);
+  // Serial.println(m);
 }
 
 void controlDisco(bool _, const bool& disco) {
+  String m = _F("==== [ Disco: ");
+  m += disco ? _F("ON") : _F("OFF");
+  m += _F(" ] ====");
+  DebugJson::debug(DebugJson::EVENT_TELEMETRY, m);
   if(disco) {
     // Disable - don't worry about setting, disco scroll will take it from here
-    lighting.disable();
+    lighting->disable();
   } else {
     // Enable and retrigger
-    lighting.resume();
+    lighting->resume();
   }
 }
 
@@ -202,13 +195,7 @@ void scrollDisco(bool _, const fsm_timestamp_t& __) {
 
   uint8_t discoPWM = (uint8_t)((cos(((timestamp % DISCO_CYCLE_MS) / (float)DISCO_CYCLE_MS) * 6.2831853) / 2.25 + 0.5) * 255);
 
-  if(disco.get() && lighting.isDisabled()) {
-    DEBUG_DELAY();
-    Serial.print("== [ Disco: ");
-    Serial.print(discoPWM);
-    Serial.print(" ] ==\n");
-    DEBUG_DELAY();
-    
+  if(disco->get() && lighting->isDisabled()) {
     analogWrite(PIN_LIGHTING_HI, discoPWM);
     analogWrite(PIN_LIGHTING_LO, 255-discoPWM);
   }

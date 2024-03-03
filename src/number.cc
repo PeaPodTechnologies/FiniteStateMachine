@@ -1,8 +1,42 @@
 #include <number.h>
 
+#include <Arduino.h>
 #include <math.h>
 
 #include <debug.h>
+
+String timestampToString(const fsm_timestamp_t& val) {
+  unsigned long seconds_tot = val / 1000;
+  unsigned long res_ms = val % 1000;
+  unsigned long minutes_tot = seconds_tot / 60;
+  unsigned long hours = minutes_tot / 60;
+
+  unsigned long res_s = seconds_tot - (minutes_tot * 60);
+  unsigned long res_m = minutes_tot - (hours * 60);
+
+  String m;
+  if(hours > 0) {
+    // if(hours < 10) m += '0';
+    m += hours;
+    m += _F("h : ");
+  }
+
+  if(minutes_tot > 0) {
+    if(res_m < 10 && hours > 0) m += '0';
+    m += res_m;
+    m += _F("m : ");
+  }
+
+  if(res_s < 10 && minutes_tot > 0) m += '0';
+  m += res_s;
+  m += '.';
+  if(res_ms < 100) m += '0';
+  if(res_ms < 10) m += '0';
+  m += res_ms;
+  m += 's';
+
+  return m;
+}
 
 int Number::compare(const Number& other) const {
   if(other.isNaN() && this->isNaN()) return 0;
@@ -133,3 +167,14 @@ Number Number::operator/(const Number& rhs) const {
 const Number& Number::minimum(const Number& a, const Number& b) { return a > b ? b : a; }
 
 const Number& Number::maximum(const Number& a, const Number& b) { return a < b ? b : a; }
+
+String Number::toString(uint8_t floating) const {
+  if(this->isNaN()) return String("NaN"); // TODO: May cause JSON errors
+  if(this->isFloating) {
+    return String((double)this->value, floating);
+  } else if(this->isSigned) {
+    return String((int)this->value);
+  } else {
+    return String((unsigned)this->value);
+  }
+}

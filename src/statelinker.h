@@ -12,13 +12,15 @@ class BangBangFlagSet;
 
 template <typename T> class FlagSetCondition : public ConditionalCallback<T> {
   protected:
-    Flag* flag;
+    Flag* const flag;
 
     void childCallback(bool comp, const T& val, const T& ref) override;
     
   public:
     FlagSetCondition(comparators_t cmp, const T& ref, Flag* flag, typename ConditionalCallback<T>::cb_getref_t getReference = nullptr);
     FlagSetCondition(comparators_t cmp, const T& ref, Flag* flag, bool invert, typename ConditionalCallback<T>::cb_getref_t getReference = nullptr);
+    FlagSetCondition(fsm_key_t key, comparators_t cmp, const T& ref, Flag* flag, typename ConditionalCallback<T>::cb_getref_t getReference = nullptr);
+    FlagSetCondition(fsm_key_t key, comparators_t cmp, const T& ref, Flag* flag, bool invert, typename ConditionalCallback<T>::cb_getref_t getReference = nullptr);
 };
 
 class BangBangFlagSet : public FlagSetCondition<Number> {
@@ -36,6 +38,7 @@ class BangBangFlagSet : public FlagSetCondition<Number> {
     const Number& childReference(const Number& val) override;
   public:
     BangBangFlagSet(const Number& lo, const Number& hi, Flag* flag);
+    BangBangFlagSet(fsm_key_t key, const Number& lo, const Number& hi, Flag* flag);
 };
 
 // Mostly useless
@@ -51,6 +54,7 @@ class LatchingFlagSet : public FlagSetCondition<bool> {
     const bool& childReference(const bool& val) override;
   public:
     explicit LatchingFlagSet(Flag* flag, bool invert = false);
+    LatchingFlagSet(fsm_key_t key, Flag* flag, bool invert = false);
 };
 
 // template <typename T> class OneShotFlagReset : public FlagSetCondition<T> {
