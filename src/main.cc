@@ -10,14 +10,21 @@
 #define TIMESTAMP_LOG_DELTA_MS 5000 // Default
 #define FSM_CYCLE_DELTA_MS     100
 
-// Watering
+// OPTIONS
 
+// #define ENABLE_WATERING 1 // Uncomment to enable watering
+// #define ENABLE_LIGHTING 1 // Uncomment to enable lighting
+// #define ENABLE_BLINK    1 // Uncomment to enable Pin 13 'disco' blink
+
+// Watering
+#ifdef ENABLE_WATERING
 #define PIN_WATERING        2
 #define DURATION_WATERING   2000     // 10 seconds
-#define PERIOD_WATERING  10000   // 30 minutes
+#define PERIOD_WATERING     10000   // 30 minutes
+#endif
 
 // Lighting
-
+#ifdef ENABLE_LIGHTING
 #define DELAY_START 1000
 
 #define PIN_LIGHTING_LO    5
@@ -26,28 +33,31 @@
 #define DURATION_LIGHTING (TWENTYFOURHRS_MILLIS*3/4)
 #define PWM_LIGHTING_LO    (unsigned char)(255*0.3)
 #define PWM_LIGHTING_HI   (unsigned char)(255*0.6)
+#endif
 
-// Fun Stuff
-#define PIN_DISCO_BUTTON  10
+#ifdef ENABLE_BLINK
 #define DELTA_DISCO  10
-#define DISCO_CYCLE_MS 1000
+#define DISCO_CYCLE_MS 2000
+#endif
 
 // #define DELAY_PHOTO_FLASH   // 
 // #define PERIOD_LIGHTING
 
+Variable* cycle;
 void logCycle(bool _, const Number& cycle);
 void logTimestamp(bool _, const fsm_timestamp_t& timestamp);
 // void logDisco(bool _, const bool& on);
 
 // void timerControlLights(bool on, const fsm_timestamp_t& timestamp);
-void controlLights(bool _, const bool& lights);
-void controlWatering(bool _, const bool& watering);
-void controlDisco(bool _, const bool& __);
-
-void scrollDisco(bool _, const fsm_timestamp_t& __);
-
-Variable* cycle;
-Flag* lighting, *watering, *disco;
+#ifdef ENABLE_LIGHTING
+Flag* lighting; void controlLights(bool _, const bool& lights);
+#endif
+#ifdef ENABLE_WATERING
+Flag* watering; void controlWatering(bool _, const bool& watering);
+#endif
+#ifdef ENABLE_BLINK
+Flag* disco; void controlDisco(bool _, const bool& __); void scrollDisco(bool _, const fsm_timestamp_t& __);
+#endif
 
 void setup() {
   // Serial
@@ -55,10 +65,17 @@ void setup() {
   while(!Serial);
 
   // Pin Modes
-  pinMode(PIN_LIGHTING_LO, OUTPUT);
-  pinMode(PIN_LIGHTING_HI, OUTPUT);
-  pinMode(PIN_WATERING, OUTPUT);
-  pinMode(PIN_DISCO_BUTTON, INPUT);
+  #ifdef ENABLE_LIGHTING
+   pinMode(PIN_LIGHTING_LO, OUTPUT);
+   pinMode(PIN_LIGHTING_HI, OUTPUT);
+  #endif
+  #ifdef ENABLE_WATERING
+   pinMode(PIN_WATERING, OUTPUT);
+  #endif
+  #ifdef ENABLE_BLINK
+    pinMode(LED_BUILTIN, OUTPUT);
+  #endif
+  // pinMode(PIN_DISCO_BUTTON, INPUT);
 
   // Construct States
   cycle = new Variable(Number(0, false, false), "Cycle");
@@ -66,6 +83,7 @@ void setup() {
 
   // Chronos.addInterval(TIMESTAMP_LOG_DELTA_MS, &logTimestamp);
 
+  #ifdef ENABLE_LIGHTING
   lighting = new Flag(false, "Light");
   lighting->addLatchingConditional(true, false, controlLights);
 
@@ -74,7 +92,9 @@ void setup() {
 
   // Timer Flag Event - Lighting OFF (Inverted)
   Chronos.addEventFlag(DELAY_START + DURATION_LIGHTING, lighting, true);
+  #endif
 
+  #ifdef ENABLE_WATERING
   watering = new Flag(false, "Water");
   watering->addLatchingConditional(true, false, controlWatering);
 
@@ -83,13 +103,16 @@ void setup() {
 
   // Timer Flag Interval - Watering OFF (Invert)
   Chronos.addIntervalFlag(PERIOD_WATERING, DURATION_WATERING, watering, true);
+  #endif
 
-  disco = new Flag(false, "Disco");
+  #ifdef ENABLE_BLINK
+  disco = new Flag(true, "Disco");
   disco->addLatchingConditional(true, false, &controlDisco);
 
   // Disco Scroller Callback - passes interval timestamp
   // discoScroller = s
   Chronos.addInterval(DELTA_DISCO, &scrollDisco);
+  #endif
 
   // DebugJson::debugSRAM();
   
@@ -112,8 +135,8 @@ void loop() {
 
   // Other Stuff
 
-  int discoPin = digitalRead(PIN_DISCO_BUTTON);
-  disco->set(discoPin == HIGH ? true : false);
+  // int discoPin = digitalRead(PIN_DISCO_BUTTON);
+  // disco->set(discoPin == HIGH ? true : false);
 }
 
 unsigned long lastCycle = 0;
@@ -148,6 +171,7 @@ void logCycle(bool _, const Number& cycle) {
 // DEBUG_JSON(m);
 // }
 
+#ifdef ENABLE_LIGHTING
 void controlLights(bool _, const bool& lights) {
   if(lights) {
     analogWrite(PIN_LIGHTING_HI, PWM_LIGHTING_HI);
@@ -162,7 +186,9 @@ void controlLights(bool _, const bool& lights) {
   DebugJson::debug(DebugJson::EVENT_TELEMETRY, m);
   // Serial.println(m);
 }
+#endif
 
+#ifdef ENABLE_WATERING
 void controlWatering(bool _, const bool& watering) {
   if(watering) {
     digitalWrite(PIN_WATERING, HIGH);
@@ -175,19 +201,21 @@ void controlWatering(bool _, const bool& watering) {
   DebugJson::debug(DebugJson::EVENT_TELEMETRY, m);
   // Serial.println(m);
 }
+#endif
 
+#ifdef ENABLE_BLINK
 void controlDisco(bool _, const bool& disco) {
   String m = _F("==== [ Disco: ");
   m += disco ? _F("ON") : _F("OFF");
   m += _F(" ] ====");
   DebugJson::debug(DebugJson::EVENT_TELEMETRY, m);
-  if(disco) {
-    // Disable - don't worry about setting, disco scroll will take it from here
-    lighting->disable();
-  } else {
-    // Enable and retrigger
-    lighting->resume();
-  }
+  // if(disco) {
+  //   // Disable - don't worry about setting, disco scroll will take it from here
+  //   lighting->disable();
+  // } else {
+  //   // Enable and retrigger
+  //   lighting->resume();
+  // }
 }
 
 void scrollDisco(bool _, const fsm_timestamp_t& __) {
@@ -195,10 +223,17 @@ void scrollDisco(bool _, const fsm_timestamp_t& __) {
 
   uint8_t discoPWM = (uint8_t)((cos(((timestamp % DISCO_CYCLE_MS) / (float)DISCO_CYCLE_MS) * 6.2831853) / 2.25 + 0.5) * 255);
 
-  if(disco->get() && lighting->isDisabled()) {
-    analogWrite(PIN_LIGHTING_HI, discoPWM);
-    analogWrite(PIN_LIGHTING_LO, 255-discoPWM);
+  String m = _F("==== [ Blink PWM: ");
+  m += discoPWM;
+  m += _F(" ] ====");
+  DebugJson::debug(DebugJson::EVENT_TELEMETRY, m);
+
+  if(disco->get()) { // && lighting->isDisabled()) {
+    // analogWrite(PIN_LIGHTING_HI, discoPWM);
+    // analogWrite(PIN_LIGHTING_LO, 255-discoPWM);
+    analogWrite(LED_BUILTIN, 255-discoPWM);
   }
 }
+#endif
 
 #endif
