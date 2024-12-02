@@ -6,6 +6,20 @@
 #include <comparators.h>
 #include <number.h>
 
+using namespace FiniteStateMachine;
+
+template <> const char* FiniteStateMachine::parseType<bool>(void) {
+  return "bool";
+}
+
+template <> const char* FiniteStateMachine::parseType<Number>(void) {
+  return "number";
+}
+
+template <> const char* FiniteStateMachine::parseType<fsm_timestamp_t>(void) {
+  return "timestamp";
+}
+
 // template <> String State<bool>::toString(const bool& val) { return (val ? _F("true") : _F("false")); }
 // template <> String State<bool>::toString(void) { return State<bool>::toString(this->value); }
 

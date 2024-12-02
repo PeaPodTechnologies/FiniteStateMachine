@@ -19,7 +19,7 @@
 
 // comparators_t cmp, const T& ref, const void* cb, callback_type_t cbtype, bool invert, cb_getref_t getReference
 
-template <typename T> ConditionalCallback<T>::ConditionalCallback(fsm_key_t key, comparators_t cmp, const T& ref, const void* cb, callback_type_t cbtype, bool invert, cb_getref_t getReference) : key(key), comparator(cmp), reference(ref), callback(cb), callbacktype(cbtype), invert(invert), getReference(getReference) {
+template <typename T> FiniteStateMachine::ConditionalCallback<T>::ConditionalCallback(fsm_key_t key, comparators_t cmp, const T& ref, const void* cb, callback_type_t cbtype, bool invert, cb_getref_t getReference) : key(key), comparator(cmp), reference(ref), callback(cb), callbacktype(cbtype), invert(invert), getReference(getReference) {
   #ifdef DEBUG_JSON
     #ifdef DEBUG_USE_BP
       BP_JSON();
@@ -55,64 +55,64 @@ template <typename T> ConditionalCallback<T>::ConditionalCallback(fsm_key_t key,
   #endif
 }
 
-template <typename T> ConditionalCallback<T>::ConditionalCallback(fsm_key_t key, comparators_t cmp, const T& ref, cb_none_t cb, bool invert, cb_getref_t getReference) : ConditionalCallback(key, cmp, ref, (const void*)cb, CB_NONE, invert, getReference) { }
+template <typename T> FiniteStateMachine::ConditionalCallback<T>::ConditionalCallback(fsm_key_t key, comparators_t cmp, const T& ref, cb_none_t cb, bool invert, cb_getref_t getReference) : ConditionalCallback(key, cmp, ref, (const void*)cb, CB_NONE, invert, getReference) { }
 
-template <typename T> ConditionalCallback<T>::ConditionalCallback(fsm_key_t key, comparators_t cmp, const T& ref, cb_comp_t cb, bool invert, cb_getref_t getReference) : ConditionalCallback(key, cmp, ref, (const void*)cb, CB_COMP, invert, getReference) { }
+template <typename T> FiniteStateMachine::ConditionalCallback<T>::ConditionalCallback(fsm_key_t key, comparators_t cmp, const T& ref, cb_comp_t cb, bool invert, cb_getref_t getReference) : ConditionalCallback(key, cmp, ref, (const void*)cb, CB_COMP, invert, getReference) { }
 
-template <typename T> ConditionalCallback<T>::ConditionalCallback(fsm_key_t key, comparators_t cmp, const T& ref, cb_compval_t cb, bool invert, cb_getref_t getReference) : ConditionalCallback(key, cmp, ref, (const void*)cb, CB_COMPVAL, getReference) { }
+template <typename T> FiniteStateMachine::ConditionalCallback<T>::ConditionalCallback(fsm_key_t key, comparators_t cmp, const T& ref, cb_compval_t cb, bool invert, cb_getref_t getReference) : ConditionalCallback(key, cmp, ref, (const void*)cb, CB_COMPVAL, getReference) { }
 
-template <typename T> ConditionalCallback<T>::ConditionalCallback(fsm_key_t key, comparators_t cmp, const T& ref, cb_compvalref_t cb, bool invert, cb_getref_t getReference) : ConditionalCallback(key, cmp, ref, (const void*)cb, invert, CB_COMPVALREF, getReference) { }
+template <typename T> FiniteStateMachine::ConditionalCallback<T>::ConditionalCallback(fsm_key_t key, comparators_t cmp, const T& ref, cb_compvalref_t cb, bool invert, cb_getref_t getReference) : ConditionalCallback(key, cmp, ref, (const void*)cb, invert, CB_COMPVALREF, getReference) { }
 
-template <typename T> ConditionalCallback<T>::ConditionalCallback(fsm_key_t key, comparators_t cmp, const T& ref, bool invert, cb_getref_t getReference) : ConditionalCallback(key, cmp, ref, nullptr, CB_COMP, invert, getReference) { }
+template <typename T> FiniteStateMachine::ConditionalCallback<T>::ConditionalCallback(fsm_key_t key, comparators_t cmp, const T& ref, bool invert, cb_getref_t getReference) : ConditionalCallback(key, cmp, ref, nullptr, CB_COMP, invert, getReference) { }
 
 // WITH KEYS WITHOUT INVERT
 
-template <typename T> ConditionalCallback<T>::ConditionalCallback(fsm_key_t key, comparators_t cmp, const T& ref, const void* cb, callback_type_t cbtype, cb_getref_t getReference) : ConditionalCallback<T>::ConditionalCallback(key, cmp, ref, cb, cbtype, false, getReference) { }
+template <typename T> FiniteStateMachine::ConditionalCallback<T>::ConditionalCallback(fsm_key_t key, comparators_t cmp, const T& ref, const void* cb, callback_type_t cbtype, cb_getref_t getReference) : ConditionalCallback<T>::ConditionalCallback(key, cmp, ref, cb, cbtype, false, getReference) { }
 
-template <typename T> ConditionalCallback<T>::ConditionalCallback(fsm_key_t key, comparators_t cmp, const T& ref, cb_none_t cb, cb_getref_t getReference) : ConditionalCallback(key, cmp, ref, (const void*)cb, CB_NONE, getReference) { }
+template <typename T> FiniteStateMachine::ConditionalCallback<T>::ConditionalCallback(fsm_key_t key, comparators_t cmp, const T& ref, cb_none_t cb, cb_getref_t getReference) : ConditionalCallback(key, cmp, ref, (const void*)cb, CB_NONE, getReference) { }
 
-template <typename T> ConditionalCallback<T>::ConditionalCallback(fsm_key_t key, comparators_t cmp, const T& ref, cb_comp_t cb, cb_getref_t getReference) : ConditionalCallback(key, cmp, ref, (const void*)cb, CB_COMP, getReference) { }
+template <typename T> FiniteStateMachine::ConditionalCallback<T>::ConditionalCallback(fsm_key_t key, comparators_t cmp, const T& ref, cb_comp_t cb, cb_getref_t getReference) : ConditionalCallback(key, cmp, ref, (const void*)cb, CB_COMP, getReference) { }
 
-template <typename T> ConditionalCallback<T>::ConditionalCallback(fsm_key_t key, comparators_t cmp, const T& ref, cb_compval_t cb, cb_getref_t getReference) : ConditionalCallback(key, cmp, ref, (const void*)cb, CB_COMPVAL, getReference) { }
+template <typename T> FiniteStateMachine::ConditionalCallback<T>::ConditionalCallback(fsm_key_t key, comparators_t cmp, const T& ref, cb_compval_t cb, cb_getref_t getReference) : ConditionalCallback(key, cmp, ref, (const void*)cb, CB_COMPVAL, getReference) { }
 
-template <typename T> ConditionalCallback<T>::ConditionalCallback(fsm_key_t key, comparators_t cmp, const T& ref, cb_compvalref_t cb, cb_getref_t getReference) : ConditionalCallback(key, cmp, ref, (const void*)cb, CB_COMPVALREF, getReference) { }
+template <typename T> FiniteStateMachine::ConditionalCallback<T>::ConditionalCallback(fsm_key_t key, comparators_t cmp, const T& ref, cb_compvalref_t cb, cb_getref_t getReference) : ConditionalCallback(key, cmp, ref, (const void*)cb, CB_COMPVALREF, getReference) { }
 
-template <typename T> ConditionalCallback<T>::ConditionalCallback(fsm_key_t key, comparators_t cmp, const T& ref, cb_getref_t getReference) : ConditionalCallback(key, cmp, ref, nullptr, CB_COMP, getReference) { }
+template <typename T> FiniteStateMachine::ConditionalCallback<T>::ConditionalCallback(fsm_key_t key, comparators_t cmp, const T& ref, cb_getref_t getReference) : ConditionalCallback(key, cmp, ref, nullptr, CB_COMP, getReference) { }
 
 // WITHOUT KEYS WITH INVERT
 
-template <typename T> ConditionalCallback<T>::ConditionalCallback(comparators_t cmp, const T& ref, const void* cb, callback_type_t cbtype, bool invert, cb_getref_t getReference) : ConditionalCallback<T>(FSM_KEY_NULL, cmp, ref, cb, cbtype, getReference) { }
+template <typename T> FiniteStateMachine::ConditionalCallback<T>::ConditionalCallback(comparators_t cmp, const T& ref, const void* cb, callback_type_t cbtype, bool invert, cb_getref_t getReference) : ConditionalCallback<T>(FSM_KEY_NULL, cmp, ref, cb, cbtype, getReference) { }
 
-template <typename T> ConditionalCallback<T>::ConditionalCallback(comparators_t cmp, const T& ref, cb_none_t cb, bool invert, cb_getref_t getReference) : ConditionalCallback(cmp, ref, (const void*)cb, CB_NONE, invert, getReference) { }
+template <typename T> FiniteStateMachine::ConditionalCallback<T>::ConditionalCallback(comparators_t cmp, const T& ref, cb_none_t cb, bool invert, cb_getref_t getReference) : ConditionalCallback(cmp, ref, (const void*)cb, CB_NONE, invert, getReference) { }
 
-template <typename T> ConditionalCallback<T>::ConditionalCallback(comparators_t cmp, const T& ref, cb_comp_t cb, bool invert, cb_getref_t getReference) : ConditionalCallback(cmp, ref, (const void*)cb, CB_COMP, invert, getReference) { }
+template <typename T> FiniteStateMachine::ConditionalCallback<T>::ConditionalCallback(comparators_t cmp, const T& ref, cb_comp_t cb, bool invert, cb_getref_t getReference) : ConditionalCallback(cmp, ref, (const void*)cb, CB_COMP, invert, getReference) { }
 
-template <typename T> ConditionalCallback<T>::ConditionalCallback(comparators_t cmp, const T& ref, cb_compval_t cb, bool invert, cb_getref_t getReference) : ConditionalCallback(cmp, ref, (const void*)cb, CB_COMPVAL, invert, getReference) { }
+template <typename T> FiniteStateMachine::ConditionalCallback<T>::ConditionalCallback(comparators_t cmp, const T& ref, cb_compval_t cb, bool invert, cb_getref_t getReference) : ConditionalCallback(cmp, ref, (const void*)cb, CB_COMPVAL, invert, getReference) { }
 
-template <typename T> ConditionalCallback<T>::ConditionalCallback(comparators_t cmp, const T& ref, cb_compvalref_t cb, bool invert, cb_getref_t getReference) : ConditionalCallback(cmp, ref, (const void*)cb, CB_COMPVALREF, invert, getReference) { }
+template <typename T> FiniteStateMachine::ConditionalCallback<T>::ConditionalCallback(comparators_t cmp, const T& ref, cb_compvalref_t cb, bool invert, cb_getref_t getReference) : ConditionalCallback(cmp, ref, (const void*)cb, CB_COMPVALREF, invert, getReference) { }
 
-template <typename T> ConditionalCallback<T>::ConditionalCallback(comparators_t cmp, const T& ref, bool invert, cb_getref_t getReference) : ConditionalCallback(cmp, ref, nullptr, CB_COMP, invert, getReference) { }
+template <typename T> FiniteStateMachine::ConditionalCallback<T>::ConditionalCallback(comparators_t cmp, const T& ref, bool invert, cb_getref_t getReference) : ConditionalCallback(cmp, ref, nullptr, CB_COMP, invert, getReference) { }
 
 // WITHOUT KEYS WITHOUT INVERT
 
-template <typename T> ConditionalCallback<T>::ConditionalCallback(comparators_t cmp, const T& ref, const void* cb, callback_type_t cbtype, cb_getref_t getReference) : ConditionalCallback<T>(String(), cmp, ref, cb, cbtype, getReference) { }
+template <typename T> FiniteStateMachine::ConditionalCallback<T>::ConditionalCallback(comparators_t cmp, const T& ref, const void* cb, callback_type_t cbtype, cb_getref_t getReference) : ConditionalCallback<T>(String(), cmp, ref, cb, cbtype, getReference) { }
 
-template <typename T> ConditionalCallback<T>::ConditionalCallback(comparators_t cmp, const T& ref, cb_none_t cb, cb_getref_t getReference) : ConditionalCallback(cmp, ref, (const void*)cb, CB_NONE, getReference) { }
+template <typename T> FiniteStateMachine::ConditionalCallback<T>::ConditionalCallback(comparators_t cmp, const T& ref, cb_none_t cb, cb_getref_t getReference) : ConditionalCallback(cmp, ref, (const void*)cb, CB_NONE, getReference) { }
 
-template <typename T> ConditionalCallback<T>::ConditionalCallback(comparators_t cmp, const T& ref, cb_comp_t cb, cb_getref_t getReference) : ConditionalCallback(cmp, ref, (const void*)cb, CB_COMP, getReference) { }
+template <typename T> FiniteStateMachine::ConditionalCallback<T>::ConditionalCallback(comparators_t cmp, const T& ref, cb_comp_t cb, cb_getref_t getReference) : ConditionalCallback(cmp, ref, (const void*)cb, CB_COMP, getReference) { }
 
-template <typename T> ConditionalCallback<T>::ConditionalCallback(comparators_t cmp, const T& ref, cb_compval_t cb, cb_getref_t getReference) : ConditionalCallback(cmp, ref, (const void*)cb, CB_COMPVAL, getReference) { }
+template <typename T> FiniteStateMachine::ConditionalCallback<T>::ConditionalCallback(comparators_t cmp, const T& ref, cb_compval_t cb, cb_getref_t getReference) : ConditionalCallback(cmp, ref, (const void*)cb, CB_COMPVAL, getReference) { }
 
-template <typename T> ConditionalCallback<T>::ConditionalCallback(comparators_t cmp, const T& ref, cb_compvalref_t cb, cb_getref_t getReference) : ConditionalCallback(cmp, ref, (const void*)cb, CB_COMPVALREF, getReference) { }
+template <typename T> FiniteStateMachine::ConditionalCallback<T>::ConditionalCallback(comparators_t cmp, const T& ref, cb_compvalref_t cb, cb_getref_t getReference) : ConditionalCallback(cmp, ref, (const void*)cb, CB_COMPVALREF, getReference) { }
 
-template <typename T> ConditionalCallback<T>::ConditionalCallback(comparators_t cmp, const T& ref, cb_getref_t getReference) : ConditionalCallback(cmp, ref, nullptr, CB_COMP, getReference) { }
+template <typename T> FiniteStateMachine::ConditionalCallback<T>::ConditionalCallback(comparators_t cmp, const T& ref, cb_getref_t getReference) : ConditionalCallback(cmp, ref, nullptr, CB_COMP, getReference) { }
 
-template <typename T> ConditionalCallback<T>& ConditionalCallback<T>::operator=(ConditionalCallback<T> const& other) { return ConditionalCallback<T>(other.comparator, other.reference, other.callback, other.callbacktype, other.getReference); }
+template <typename T> FiniteStateMachine::ConditionalCallback<T>& FiniteStateMachine::ConditionalCallback<T>::operator=(ConditionalCallback<T> const& other) { return ConditionalCallback<T>(other.comparator, other.reference, other.callback, other.callbacktype, other.getReference); }
 
-template <typename T> void ConditionalCallback<T>::childCallback(bool comp, const T& val, const T& ref) { return; }
-template <typename T> const T& ConditionalCallback<T>::childReference(const T& val) { return this->reference; }
+template <typename T> void FiniteStateMachine::ConditionalCallback<T>::childCallback(bool comp, const T& val, const T& ref) { return; }
+template <typename T> const T& FiniteStateMachine::ConditionalCallback<T>::childReference(const T& val) { return this->reference; }
 
-template <typename T> void ConditionalCallback<T>::operator()(const T& val) { 
+template <typename T> void FiniteStateMachine::ConditionalCallback<T>::operator()(const T& val) { 
   #ifdef DEBUG_JSON
     #ifdef DEBUG_USE_BP
       BP_JSON();
@@ -130,9 +130,6 @@ template <typename T> void ConditionalCallback<T>::operator()(const T& val) {
       }
     #endif
   #endif
-  if(this->disabled){
-    return;
-  }
   
   // Update the reference value
   if (this->getReference != nullptr) {
@@ -162,9 +159,9 @@ template <typename T> void ConditionalCallback<T>::operator()(const T& val) {
   this->callOperator(val, this->reference);
 }
 
-template <typename T> void ConditionalCallback<T>::operator()(const T& val, const T& ref) { this->callOperator(val, ref); }
+template <typename T> void FiniteStateMachine::ConditionalCallback<T>::operator()(const T& val, const T& ref) { this->callOperator(val, ref); }
 
-template <typename T> void ConditionalCallback<T>::setComparator(comparators_t cmp) {
+template <typename T> void FiniteStateMachine::ConditionalCallback<T>::setComparator(comparators_t cmp) {
   #ifdef DEBUG_JSON
     #ifdef DEBUG_USE_BP
       BP_JSON();
@@ -178,13 +175,21 @@ template <typename T> void ConditionalCallback<T>::setComparator(comparators_t c
   this->comparator = cmp;
 }
 
-template <typename T> void ConditionalCallback<T>::callOperator(const T& val, const T& ref) {
-  bool result = ConditionalCallback<T>::compare(this->comparator, val, ref);
+template <typename T> void FiniteStateMachine::ConditionalCallback<T>::callOperator(const T& val, const T& ref) {
+  bool result = FiniteStateMachine::ConditionalCallback<T>::compare(this->comparator, val, ref);
 
-  if(result) this->executeCallback(val, ref);
+  // if(this->lastComparison) this->executeCallback(val, ref);
+  if(result) { this->executionVal = val; this->executionRef = ref; } // only change val/ref if the comparison is true
+  this->execute |= result;  // we want execution to stay true if it's already true, and use the cached val/ref
 }
 
-template <typename T> void ConditionalCallback<T>::executeCallback(const T& val, const T& ref) {
+template <typename T> void FiniteStateMachine::ConditionalCallback<T>::executeCallback(const T& val, const T& ref) {
+  if(this->disabled) return;
+  if(!this->execute) return;
+
+  Serial.println("!EXECUTE!");
+  this->execute = false;
+  
   #ifdef DEBUG_JSON
     #ifdef DEBUG_USE_BP
       BP_JSON();
@@ -258,9 +263,9 @@ template <typename T> void ConditionalCallback<T>::executeCallback(const T& val,
   // delay(1);
 }
 
-template <typename T> void ConditionalCallback<T>::disable() { this->disabled = true; }
-template <typename T> void ConditionalCallback<T>::enable() { this->disabled = false; }
-template <typename T> void ConditionalCallback<T>::enable(const T& val) { this->disabled = false; this->executeCallback(val, this->reference); }
+template <typename T> void FiniteStateMachine::ConditionalCallback<T>::disable() { this->disabled = true; }
+template <typename T> void FiniteStateMachine::ConditionalCallback<T>::enable() { this->disabled = false; }
+template <typename T> void FiniteStateMachine::ConditionalCallback<T>::enable(const T& val) { this->disabled = false; this->executeCallback(val, this->reference); }
 
 #endif
 

@@ -5,6 +5,8 @@
 #include <comparators.h>
 #include <number.h>
 
+using namespace FiniteStateMachine;
+
 BangBangFlagSet::BangBangFlagSet(const Number& lo, const Number& hi, Flag* flag) : low(Number::minimum(lo, hi)), high(Number::maximum(lo, hi)), FlagSetCondition<Number>(CMP_LES, low, flag, (double)hi < (double)lo) {
   // #ifdef DEBUG_JSON
   //   #ifdef DEBUG_USE_BP
@@ -121,7 +123,8 @@ void BangBangFlagSet::callOperator(const Number& val, const Number& ref) {
     #endif
 
     this->triggered = true;
-    this->executeCallback(val, ref);
+    this->execute = true;
+    this->executionVal = val; this->executionRef = ref;
   } else if(!result) {
     // Reset
     #ifdef DEBUG_JSON
@@ -146,7 +149,8 @@ void LatchingFlagSet::callOperator(const bool& val, const bool& ref) {
       #endif
     #endif
     this->executeCallback(val, ref);
-    this->triggered = true;
+    this->execute = true;
+    this->executionVal = val; this->executionRef = ref;
   } else if(!result) {
     // Reset
     #ifdef DEBUG_JSON

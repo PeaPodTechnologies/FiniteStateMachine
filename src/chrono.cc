@@ -5,8 +5,10 @@
 #include <state.h>
 #include <comparators.h>
 
+using namespace FiniteStateMachine;
+
 const char* key_chronograph = {"Chronograph"};
-Chronograph Chronos = Chronograph();
+Chronograph FiniteStateMachine::Chronos = Chronograph();
 
 IntervalCallback::IntervalCallback(const fsm_timestamp_t& delta, const void* cb, callback_type_t cbtype, bool invert) : now(delta), delta(delta), ConditionalCallback<fsm_timestamp_t>(CMP_GTR, delta, cb, cbtype, invert) { }
 
@@ -25,7 +27,7 @@ const fsm_timestamp_t& IntervalCallback::childReference(const fsm_timestamp_t& v
       #ifdef DEBUG_USE_BP
         BP_JSON();
       #else
-        String m = _F("Chrono: Interval ");
+        String m = _F("Interval ");
         // if(this->key.length() > 0) { m += '\''; m += this->key; m += "' "; }
         if(this->key != FSM_KEY_NULL) { m += '\''; m += this->key; m += "' "; }
         m += _F("Reset");
@@ -48,7 +50,7 @@ void IntervalCallback::set(const fsm_timestamp_t& val) {
     #ifdef DEBUG_USE_BP
       BP_JSON();
     #else
-      String m = _F("Chrono: Interval ");
+      String m = _F("Interval ");
       // if(this->key.length() > 0) { m += '\''; m += this->key; m += "' "; }
       if(this->key != FSM_KEY_NULL) { m += '\''; m += this->key; m += "' "; }
       m += _F("Set (");
@@ -98,7 +100,7 @@ void ChronoEvent::callOperator(const fsm_timestamp_t& val, const fsm_timestamp_t
       #ifdef DEBUG_USE_BP
         BP_JSON();
       #else
-        String m = _F("Chrono: Event ");
+        String m = _F("Event ");
         // if(this->key.length() > 0) { m += '\''; m += this->key; m += "' "; }
         if(this->key != FSM_KEY_NULL) { m += '\''; m += this->key; m += "' "; }
         
@@ -108,7 +110,8 @@ void ChronoEvent::callOperator(const fsm_timestamp_t& val, const fsm_timestamp_t
       #endif
     #endif // DEBUG
 
-    this->executeCallback(val, ref);
+    this->execute = true;
+    this->executionVal = val; this->executionRef = ref;
   } else if(!result) {
     this->triggered = false;
   }
@@ -121,7 +124,8 @@ void FlagEvent::callOperator(const fsm_timestamp_t& val, const fsm_timestamp_t& 
   bool result = compare(this->comparator, val, ref);
   if(!this->triggered && result) {
     this->triggered = true;
-    this->executeCallback(val, ref);
+    this->execute = true;
+    this->executionVal = val; this->executionRef = ref;
   } else if(!result) {
     this->triggered = false;
   }
@@ -158,20 +162,20 @@ void Chronograph::set(const fsm_timestamp_t& _val) {
   // Null frame
   const fsm_timestamp_t delta = val > last ? val - last : 0;
   
-  #ifdef DEBUG_JSON
-    #ifdef DEBUG_USE_BP
-      BP_JSON();
-    #else
-      String m = _F("Chrono: Set Time (");
+  // #ifdef DEBUG_JSON
+  //   #ifdef DEBUG_USE_BP
+  //     BP_JSON();
+  //   #else
+  //     String m = _F("Chrono: Set Time (");
 
-      m += timestampToString(val);
+  //     m += timestampToString(val);
 
-      m += ')';
+  //     m += ')';
 
-      // DEBUG_JSON(m.c_str(), m.length());
-      DEBUG_JSON(m);
-    #endif
-  #endif
+  //     // DEBUG_JSON(m.c_str(), m.length());
+  //     DEBUG_JSON(m);
+  //   #endif
+  // #endif
 
   // Call super - let getRef handle overflow ;)
   ((State<fsm_timestamp_t>*)this)->set(val);
@@ -196,7 +200,7 @@ ConditionalCallback<fsm_timestamp_t>* Chronograph::addEventFlag(fsm_key_t key, c
     #ifdef DEBUG_USE_BP
       BP_JSON();
     #else
-      String m = _F("Chrono: Add FlagEvent ");
+      String m = _F("Add Flag Event ");
       // if(key.length() > 0) { m += '\''; m += key; m += "' "; }
       if(key != FSM_KEY_NULL) { m += '\''; m += key; m += "' "; }
       m += '(';
@@ -238,7 +242,7 @@ IntervalCallback* Chronograph::addInterval(fsm_key_t key, const fsm_timestamp_t&
     #ifdef DEBUG_USE_BP
       BP_JSON();
     #else
-      String m = _F("Chrono: Add Interval ");
+      String m = _F("Add Interval ");
       // if(key.length() > 0) { m += '\''; m += key; m += "' "; }
       if(key != FSM_KEY_NULL) { m += '\''; m += key; m += "' "; }
       m += "(";
@@ -269,7 +273,7 @@ IntervalCallback* Chronograph::addIntervalFlag(fsm_key_t key, const fsm_timestam
     #ifdef DEBUG_USE_BP
       BP_JSON();
     #else
-      String m = _F("Chrono: Add FlagInterval ");
+      String m = _F("Add Flag Interval ");
       // if(key.length() > 0) { m += '\''; m += key; m += "' "; }
       if(key != FSM_KEY_NULL) { m += '\''; m += key; m += "' "; }
       m += '(';
@@ -315,7 +319,7 @@ IntervalCallback* Chronograph::addTwentyFourTimeout(fsm_key_t key, const fsm_tim
     #ifdef DEBUG_USE_BP
       BP_JSON();
     #else
-      String m = _F("Chrono: Add 24HR FlagInterval ");
+      String m = _F("Add 24HR Flag Interval ");
       // if(key.length() > 0) { m += '\''; m += key; m += "' "; }
       if(key != FSM_KEY_NULL) { m += '\''; m += key; m += "' "; }
       if(phase > 0) {

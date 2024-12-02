@@ -3,16 +3,18 @@
 #include <debug.h>
 #include <number.h>
 
-// String FSM_KEY_NULL = String();
-fsm_key_t FSM_KEY_NULL = nullptr;
+using namespace FiniteStateMachine;
+
+// fsm_key_t FSM_KEY_NULL = String();
+fsm_key_t FiniteStateMachine::FSM_KEY_NULL = nullptr;
 
 template <> ConditionalCallback<bool>::~ConditionalCallback() { }
 template <> ConditionalCallback<Number>::~ConditionalCallback() { }
 template <> ConditionalCallback<fsm_timestamp_t>::~ConditionalCallback() { }
 
-template <> String stateToString<bool>(const bool& val) { return val ? _F("true") : _F("false"); }
-template <> String stateToString<Number>(const Number& val) { return val.toString(); }
-template <> String stateToString<fsm_timestamp_t>(const fsm_timestamp_t& val) { return timestampToString(val); }
+template <> String FiniteStateMachine::stateToString<bool>(const bool& val) { return val ? _F("true") : _F("false"); }
+template <> String FiniteStateMachine::stateToString<Number>(const Number& val) { return val.toString(); }
+template <> String FiniteStateMachine::stateToString<fsm_timestamp_t>(const fsm_timestamp_t& val) { return timestampToString(val); }
 
 template <> bool ConditionalCallback<bool>::compare(comparators_t cmp, const bool& val, const bool& ref) {
   bool result = false;
@@ -284,7 +286,8 @@ void BangBangConditional::callOperator(const Number& val, const Number& ref) {
       #endif
     #endif
     this->triggered = true;
-    this->executeCallback(val, ref);
+    this->execute = true;
+    this->executionVal = val; this->executionRef = ref;
   } else if(!result) {
     // Reset
     #ifdef DEBUG_JSON
