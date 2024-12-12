@@ -1,7 +1,7 @@
 #include <Arduino.h>
 
 // Uncomment to enable debug
-#define DEBUG 1
+// #define DEBUG 1
 
 // CROSS-LIBRARY DEBUG COMPATIBILITY
 #ifdef DEBUG
@@ -16,10 +16,10 @@
 // Just once
 // #define FSM_DEBUG_SERIAL DEBUG_SERIAL
 
-#include <DebugJson.h>
+// #include <DebugJson.h>
 
 #ifndef DEBUG_DELAY
-#define DEBUG_DELAY() { DEBUG_SERIAL.flush(); delay(10); }
+#define DEBUG_DELAY() { DEBUG_SERIAL.flush(); delay(1); }
 #endif
 #endif
 

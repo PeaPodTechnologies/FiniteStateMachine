@@ -1,11 +1,13 @@
 #ifndef UNIT_TEST
+#define UNIT_TEST 1
+#define IS_MAIN 1
 
 #include <Arduino.h>
 
 #include <debug.h>
 #include <chrono.h>
 
-#include <avr/wdt.h>
+// #include <avr/wdt.h>
 
 #define TIMESTAMP_LOG_DELTA_MS 5000 // Default
 #define FSM_CYCLE_DELTA_MS     100
@@ -45,7 +47,6 @@
 
 Variable* cycle;
 void logCycle(bool _, const Number& cycle);
-void logTimestamp(bool _, const fsm_timestamp_t& timestamp);
 // void logDisco(bool _, const bool& on);
 
 // void timerControlLights(bool on, const fsm_timestamp_t& timestamp);
@@ -80,8 +81,6 @@ void setup() {
   // Construct States
   cycle = new Variable(Number(0, false, false), "Cycle");
   cycle->addLoggerCallback(logCycle);
-
-  // Chronos.addInterval(TIMESTAMP_LOG_DELTA_MS, &logTimestamp);
 
   #ifdef ENABLE_LIGHTING
   lighting = new Flag(false, "Light");
@@ -160,7 +159,11 @@ void logCycle(bool _, const Number& cycle) {
   }
   m += _F(" ] ====");
 
+  #ifdef DEBUG_JSON
   DebugJson::debug(m);
+  #else
+  Serial.println(m);
+  #endif
 }
 
 // void logDisco(bool _, const bool& on) {

@@ -171,7 +171,7 @@ const Number& Number::maximum(const Number& a, const Number& b) { return a < b ?
 String Number::toString(uint8_t floating) const {
   if(this->isNaN()) return String("NaN"); // TODO: May cause JSON errors
   if(this->isFloating) {
-    return String((double)this->value, floating);
+    return String((double)this->value, (unsigned int)floating);
   } else if(this->isSigned) {
     return String((int)this->value);
   } else {
