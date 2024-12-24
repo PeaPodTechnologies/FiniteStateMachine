@@ -31,7 +31,7 @@ template <typename T> FlagSetCondition<T>::FlagSetCondition(fsm_key_t key, compa
 template <typename T> void FlagSetCondition<T>::childCallback(bool comp, const T& val, const T& ref) {
   #ifdef DEBUG_JSON
     #ifdef DEBUG_USE_BP
-      BP_JSON();
+      BP_JSON(comp ? _F("FLAGCB 1") : _F("FLAGCB 0"));
     #else
       String m = _F("Flag Set (");
       m += stateToString(comp);

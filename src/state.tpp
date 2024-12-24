@@ -62,7 +62,7 @@ template <typename T> T State<T>::get(void) {
 template <typename T> void State<T>::set(const T& val) {
   #ifdef DEBUG_JSON
     #ifdef DEBUG_USE_BP
-      BP_JSON();
+      BP_JSON("SETVAL " + stateToString(val));
     #else
       String m = _F("State ");
       // if(this->key.length() > 0) { m += '\''; m += this->key; m += '\''; m += ' '; }

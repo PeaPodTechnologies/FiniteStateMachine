@@ -44,7 +44,13 @@ template <> bool ConditionalCallback<bool>::compare(comparators_t cmp, const boo
   }
   #ifdef DEBUG_JSON
     #ifdef DEBUG_USE_BP
-      BP_JSON();
+      String m = _F("CMPFLG ");
+      m += stateToString(val);
+      m += ' ';
+      m += parseComparator(cmp, result);
+      m += ' ';
+      m += stateToString(ref);
+      BP_JSON(m);
     #else
       String m = _F("Flag (");
       m += stateToString(val);
@@ -101,7 +107,13 @@ template <> bool ConditionalCallback<Number>::compare(comparators_t cmp, const N
   }
   #ifdef DEBUG_JSON
     #ifdef DEBUG_USE_BP
-      BP_JSON();
+      String m = _F("CMPVAR ");
+      m += stateToString(val);
+      m += ' ';
+      m += parseComparator(cmp, result);
+      m += ' ';
+      m += stateToString(ref);
+      BP_JSON(m);
     #else
       String m = _F("Variable (");
       m += val.toString();
@@ -145,7 +157,14 @@ template <> bool ConditionalCallback<fsm_timestamp_t>::compare(comparators_t cmp
   }
   #ifdef DEBUG_JSON
     #ifdef DEBUG_USE_BP
-      BP_JSON();
+      String m = _F("CMPTIM ");
+      m += timestampToString(val);
+      m += ' ';
+      m += parseComparator(cmp, result);
+      m += ' ';
+      m += timestampToString(ref);
+      BP_JSON(m);
+      // BP_JSON(_F("CMPTIM"));
     #else
       String m = _F("Timestamp (");
       m += timestampToString(val);
@@ -222,7 +241,7 @@ void BangBangConditional::childCallback(bool comp, const Number& val, const Numb
   const void* fn = this->state ? this->rising : this->falling;
   #ifdef DEBUG_JSON
     #ifdef DEBUG_USE_BP
-      BP_JSON();
+      BP_JSON(this->state ? _F("BANGCB 1") : _F("BANGCB 0"));
     #else
       String m = _F("BangBang ");
       m += (this->state ? _F("High") : _F("Low"));
@@ -278,9 +297,9 @@ void BangBangConditional::callOperator(const Number& val, const Number& ref) {
   if(!this->triggered && result) {
     #ifdef DEBUG_JSON
       #ifdef DEBUG_USE_BP
-        BP_JSON();
+        BP_JSON(_F("BANGOP 1"));
       #else
-        DEBUG_JSON(_F("BangBang Triggered"), 18);
+        DEBUG_JSON(_F("BangBang Triggered"));
       #endif
     #endif
     this->triggered = true;
@@ -289,9 +308,9 @@ void BangBangConditional::callOperator(const Number& val, const Number& ref) {
     // Reset
     #ifdef DEBUG_JSON
       #ifdef DEBUG_USE_BP
-        BP_JSON();
+        BP_JSON(_F("BANGOP 0"));
       #else
-        DEBUG_JSON(_F("BangBang Trigger Reset"), 22);
+        DEBUG_JSON(_F("BangBang Trigger Reset"));
       #endif
     #endif
     this->triggered = false;
@@ -328,9 +347,9 @@ void LatchingConditional::callOperator(const bool& val, const bool& ref) {
   if(!this->triggered && result) {
     #ifdef DEBUG_JSON
       #ifdef DEBUG_USE_BP
-        BP_JSON();
+        BP_JSON(_F("LACHOP 1"));
       #else
-        DEBUG_JSON(_F("Latch Triggered"), 15);
+        DEBUG_JSON(_F("Latch Triggered"));
       #endif
     #endif
     this->triggered = true;
@@ -340,9 +359,9 @@ void LatchingConditional::callOperator(const bool& val, const bool& ref) {
     this->triggered = false;
     #ifdef DEBUG_JSON
       #ifdef DEBUG_USE_BP
-        BP_JSON();
+        BP_JSON(_F("LACHOP 0"));
       #else
-        DEBUG_JSON(_F("Latch Trigger Reset"), 19);
+        DEBUG_JSON(_F("Latch Trigger Reset"));
       #endif
     #endif
   }
@@ -355,12 +374,12 @@ void LatchingConditional::childCallback(bool comp, const bool& val, const bool& 
   const void* fn = val ? this->rising : this->falling;
   #ifdef DEBUG_JSON
     #ifdef DEBUG_USE_BP
-      BP_JSON();
+      BP_JSON(val ? _F("LATCHCB 1") : _F("LATCHCB 0"));
     #else
       if(val) {
-        DEBUG_JSON(_F("Latch Set 1"), 11);
+        DEBUG_JSON(_F("Latch Set 1"));
       } else {
-        DEBUG_JSON(_F("Latch Reset 0"), 13);
+        DEBUG_JSON(_F("Latch Reset 0"));
       }
     #endif
   #endif

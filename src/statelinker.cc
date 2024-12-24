@@ -35,22 +35,24 @@ BangBangFlagSet::BangBangFlagSet(fsm_key_t key, const Number& lo, const Number& 
 
 void BangBangFlagSet::childCallback(bool comp, const Number& val, const Number& ref) {
   this->state = (ref == this->high);
+  bool _  = !(this->invert ^ this->state);
 
-  // #ifdef DEBUG_JSON
-  //   #ifdef DEBUG_USE_BP
-  //     BP_JSON();
-  //   #else
-  //   String m = _F("BangBang FlagSet ")
-  //   m += this->state ? 1 : 0
+  #ifdef DEBUG_JSON
+    #ifdef DEBUG_USE_BP
+      BP_JSON(_ ? _F("BBFLAG 1") : _F("BBFLAG 0"));
+    #else
+    // String m = _F("BangBang FlagSet ")
+    // m += this->state ? 1 : 0
 
-  //     FSM_DEBUG_SERIAL.print(_F("BangBang (High)\n"));
-  //     DEBUG_DELAY();
-  //   } else {
-  //     DEBUG_DELAY();
-  //     FSM_DEBUG_SERIAL.print(_F("BangBang (Low)\n"));
-  //     DEBUG_DELAY();
-  //   }
-  // #endif
+    //   FSM_DEBUG_SERIAL.print(_F("BangBang (High)\n"));
+    //   DEBUG_DELAY();
+    // } else {
+    //   DEBUG_DELAY();
+    //   FSM_DEBUG_SERIAL.print(_F("BangBang (Low)\n"));
+    //   DEBUG_DELAY();
+    // }
+    #endif
+  #endif
 
   // state ? comp : !comp;
   // T XOR T = T
@@ -59,7 +61,6 @@ void BangBangFlagSet::childCallback(bool comp, const Number& val, const Number& 
   // F XOR F = T
   // comp = !(comp ^ this->state);
   // comp = this->state ? comp : !comp;
-  bool _  = !(this->invert ^ this->state);
 
   // #ifdef FSM_DEBUG_SERIAL
   //   DEBUG_DELAY();
@@ -74,7 +75,7 @@ void BangBangFlagSet::childCallback(bool comp, const Number& val, const Number& 
 const Number& BangBangFlagSet::childReference(const Number& val) {
   #ifdef DEBUG_JSON
     #ifdef DEBUG_USE_BP
-      BP_JSON();
+      BP_JSON(this->state ? _F("BBREF 1") : _F("BBREF 0"));
     #else
       String m = _F("Flag BangBang State: ");
       m += this->state ? "Hi" : "Lo";
@@ -114,9 +115,9 @@ void BangBangFlagSet::callOperator(const Number& val, const Number& ref) {
   if(!this->triggered && result) {
     #ifdef DEBUG_JSON
       #ifdef DEBUG_USE_BP
-        BP_JSON();
+        BP_JSON(_F("BBFCOP 1"));
       #else
-        DEBUG_JSON(_F("Flag BangBang Triggered"), 23);
+        DEBUG_JSON(_F("Flag BangBang Triggered"));
       #endif
     #endif
 
@@ -126,9 +127,9 @@ void BangBangFlagSet::callOperator(const Number& val, const Number& ref) {
     // Reset
     #ifdef DEBUG_JSON
       #ifdef DEBUG_USE_BP
-        BP_JSON();
+        BP_JSON(_F("BBFCOP 0"));
       #else
-        DEBUG_JSON(_F("Flag BangBang Trigger Reset"), 27);
+        DEBUG_JSON(_F("Flag BangBang Trigger Reset"));
       #endif
     #endif
     this->triggered = false;
@@ -140,9 +141,9 @@ void LatchingFlagSet::callOperator(const bool& val, const bool& ref) {
   if(!this->triggered && result) {
     #ifdef DEBUG_JSON
       #ifdef DEBUG_USE_BP
-        BP_JSON();
+        BP_JSON(_F("LAFCOP 1"));
       #else
-        DEBUG_JSON(_F("Flag Latch Triggered"), 20);
+        DEBUG_JSON(_F("Flag Latch Triggered"));
       #endif
     #endif
     this->executeCallback(val, ref);
@@ -151,9 +152,9 @@ void LatchingFlagSet::callOperator(const bool& val, const bool& ref) {
     // Reset
     #ifdef DEBUG_JSON
       #ifdef DEBUG_USE_BP
-        BP_JSON();
+        BP_JSON(_F("LAFCOP 0"));
       #else
-        DEBUG_JSON(_F("Flag Latch Trigger Reset"), 24);
+        DEBUG_JSON(_F("Flag Latch Trigger Reset"));
       #endif
     #endif
     this->triggered = false;
@@ -168,23 +169,21 @@ LatchingFlagSet::LatchingFlagSet(fsm_key_t key, Flag* flag, bool invert) : FlagS
 void LatchingFlagSet::childCallback(bool comp, const bool& val, const bool& ref) {
   this->state = !ref;
   this->triggered = false;
+  bool _ = val ^ ref;
 
   #ifdef DEBUG_JSON
     #ifdef DEBUG_USE_BP
-      BP_JSON();
+      BP_JSON(_ ? _F("LAFCAL 1") : _F("LAFCAL 0"));
     #else
       String m = _F("Flag Latch ");
       m += val ? _F("(High), ") : _F("(Low), ");
     #endif
   #endif
 
-  bool _ = val ^ ref;
 
   // Cast void* cb fn pointer to appropriate type and call
   #ifdef DEBUG_JSON
-    #ifdef DEBUG_USE_BP
-      BP_JSON();
-    #else
+    #ifndef DEBUG_USE_BP
       m += _F("Flag Set (");
       m += stateToString(_);
       m += ')';

@@ -115,7 +115,7 @@ template <typename T> const T& ConditionalCallback<T>::childReference(const T& v
 template <typename T> void ConditionalCallback<T>::operator()(const T& val) { 
   #ifdef DEBUG_JSON
     #ifdef DEBUG_USE_BP
-      BP_JSON();
+      BP_JSON(_F("CALLOP"));
     #else
       String m = _F("Condition ");
       // if(this->key.length() > 0) { m += '\''; m += this->key; m += '\''; m += ' '; }
@@ -146,9 +146,7 @@ template <typename T> void ConditionalCallback<T>::operator()(const T& val) {
     this->reference = this->childReference(val);
   }
   #ifdef DEBUG_JSON
-    #ifdef DEBUG_USE_BP
-      BP_JSON();
-    #else
+    #ifndef DEBUG_USE_BP
       m += _F("Ref = ");
       m += stateToString<T>(this->reference);
       // Serial.print(">>>");
@@ -167,7 +165,7 @@ template <typename T> void ConditionalCallback<T>::operator()(const T& val, cons
 template <typename T> void ConditionalCallback<T>::setComparator(comparators_t cmp) {
   #ifdef DEBUG_JSON
     #ifdef DEBUG_USE_BP
-      BP_JSON();
+      BP_JSON("SETCMP" + String(parseComparator(cmp)));
     #else
       String m = _F("Comparator Change = ");
       m += parseComparator(cmp);
@@ -185,9 +183,22 @@ template <typename T> void ConditionalCallback<T>::callOperator(const T& val, co
 }
 
 template <typename T> void ConditionalCallback<T>::executeCallback(const T& val, const T& ref) {
+  bool _ = this->invert ? false : true;
+
   #ifdef DEBUG_JSON
     #ifdef DEBUG_USE_BP
-      BP_JSON();
+      String m = _F("CBEXEC (");
+      if(this->callbacktype >= CB_COMP) {
+        m += stateToString<bool>(_);
+      }
+      if(this->callbacktype >= CB_COMPVAL) {
+        m += ", "; m += stateToString<T>(val);
+      }
+      if(this->callbacktype >= CB_COMPVALREF) {
+        m += ", "; m += stateToString<T>(ref);
+      }
+      m += ')';
+      BP_JSON(m);
     #else
       String m = _F("CB Execution Args [");
       if(this->callbacktype >= CB_COMP) {
@@ -213,7 +224,6 @@ template <typename T> void ConditionalCallback<T>::executeCallback(const T& val,
     #endif
   #endif
 
-  bool _ = this->invert ? false : true;
 
   // #ifdef FSM_DEBUG_SERIAL
   //   DEBUG_DELAY();

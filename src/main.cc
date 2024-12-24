@@ -10,13 +10,13 @@
 // #include <avr/wdt.h>
 
 #define TIMESTAMP_LOG_DELTA_MS 5000 // Default
-#define FSM_CYCLE_DELTA_MS     100
+#define FSM_CYCLE_DELTA_MS     1000
 
 // OPTIONS
 
 // #define ENABLE_WATERING 1 // Uncomment to enable watering
 // #define ENABLE_LIGHTING 1 // Uncomment to enable lighting
-// #define ENABLE_BLINK    1 // Uncomment to enable Pin 13 'disco' blink
+#define ENABLE_BLINK    1 // Uncomment to enable Pin 13 'disco' blink
 
 // Watering
 #ifdef ENABLE_WATERING
@@ -160,7 +160,7 @@ void logCycle(bool _, const Number& cycle) {
   m += _F(" ] ====");
 
   #ifdef DEBUG_JSON
-  DebugJson::debug(m);
+  DEBUG_JSON(m);
   #else
   Serial.println(m);
   #endif
@@ -186,7 +186,7 @@ void controlLights(bool _, const bool& lights) {
   String m = _F("==== [ Lights: ");
   m += lights ? _F("ON") : _F("OFF");
   m += _F(" ] ====");
-  DebugJson::debug(DebugJson::EVENT_TELEMETRY, m);
+  DebugJson::telemetry(millis(), m, Serial);
   // Serial.println(m);
 }
 #endif
@@ -201,7 +201,7 @@ void controlWatering(bool _, const bool& watering) {
   String m = _F("==== [ Watering: ");
   m += watering ? _F("ON") : _F("OFF");
   m += _F(" ] ====");
-  DebugJson::debug(DebugJson::EVENT_TELEMETRY, m);
+  DebugJson::telemetry(millis(), m, Serial);
   // Serial.println(m);
 }
 #endif
@@ -211,7 +211,7 @@ void controlDisco(bool _, const bool& disco) {
   String m = _F("==== [ Disco: ");
   m += disco ? _F("ON") : _F("OFF");
   m += _F(" ] ====");
-  DebugJson::debug(DebugJson::EVENT_TELEMETRY, m);
+  DebugJson::telemetry(millis(), m, Serial);
   // if(disco) {
   //   // Disable - don't worry about setting, disco scroll will take it from here
   //   lighting->disable();
@@ -229,7 +229,7 @@ void scrollDisco(bool _, const fsm_timestamp_t& __) {
   String m = _F("==== [ Blink PWM: ");
   m += discoPWM;
   m += _F(" ] ====");
-  DebugJson::debug(DebugJson::EVENT_TELEMETRY, m);
+  DebugJson::telemetry(millis(), m, Serial);
 
   if(disco->get()) { // && lighting->isDisabled()) {
     // analogWrite(PIN_LIGHTING_HI, discoPWM);

@@ -23,7 +23,7 @@ const fsm_timestamp_t& IntervalCallback::childReference(const fsm_timestamp_t& v
 
     #ifdef DEBUG_JSON
       #ifdef DEBUG_USE_BP
-        BP_JSON();
+        BP_JSON(_F("CHRONO RESET"));
       #else
         String m = _F("Chrono: Interval ");
         // if(this->key.length() > 0) { m += '\''; m += this->key; m += "' "; }
@@ -46,7 +46,7 @@ void IntervalCallback::set(const fsm_timestamp_t& val) {
   this->now = val;
   #ifdef DEBUG_JSON
     #ifdef DEBUG_USE_BP
-      BP_JSON();
+      BP_JSON("CHRONO INTSET " + timestampToString(val));
     #else
       String m = _F("Chrono: Interval ");
       // if(this->key.length() > 0) { m += '\''; m += this->key; m += "' "; }
@@ -70,18 +70,18 @@ FlagInterval::FlagInterval(fsm_key_t key, const fsm_timestamp_t& delta, Flag* fl
 FlagInterval::FlagInterval(fsm_key_t key, const fsm_timestamp_t& delta, const fsm_timestamp_t& phase, Flag* flag, bool invert) : flag(flag), IntervalCallback(key, delta, phase, nullptr, CB_COMP, invert) { }
 
 void FlagInterval::childCallback(bool comp, const fsm_timestamp_t& val, const fsm_timestamp_t& ref) {
-  // #ifdef DEBUG_JSON
-  //   #ifdef DEBUG_USE_BP
-  //     BP_JSON();
-  //   #else
-  //     String m = _F("Chrono: FlagInterval ");
-  //     if(this->key != nullptr) { m += '\''; m += key; m += "' "; }
-  //     m += _F("Set (");
-  //     m += Flag::toString(comp);
-  //     m += ')';
-  //     // DEBUG_JSON(m.c_str(), m.length());
-  //   #endif
-  // #endif // DEBUG
+  #ifdef DEBUG_JSON
+    #ifdef DEBUG_USE_BP
+      BP_JSON(comp ? _F("CHRONO FLAGINT 1") : _F("CHRONO FLAGINT 0"));
+    #else
+      String m = _F("Chrono: FlagInterval ");
+      if(this->key != nullptr) { m += '\''; m += key; m += "' "; }
+      m += _F("Set (");
+      m += Flag::toString(comp);
+      m += ')';
+      DEBUG_JSON(m);
+    #endif
+  #endif // DEBUG
   this->flag->set(comp);
 }
 
@@ -96,7 +96,7 @@ void ChronoEvent::callOperator(const fsm_timestamp_t& val, const fsm_timestamp_t
 
     #ifdef DEBUG_JSON
       #ifdef DEBUG_USE_BP
-        BP_JSON();
+        BP_JSON(_F("CHRONO EVENT"));
       #else
         String m = _F("Chrono: Event ");
         // if(this->key.length() > 0) { m += '\''; m += this->key; m += "' "; }
@@ -127,18 +127,19 @@ void FlagEvent::callOperator(const fsm_timestamp_t& val, const fsm_timestamp_t& 
   }
 }
 void FlagEvent::childCallback(bool comp, const fsm_timestamp_t& val, const fsm_timestamp_t& ref) {
-  // #ifdef DEBUG_JSON
-  //   #ifdef DEBUG_USE_BP
-  //     BP_JSON();
-  //   #else
-  //     String m = _F("Chrono: FlagEvent ");
-  //     if(this->key.length() > 0) { m += '\''; m += this->key; m += "' "; }
-  //     m += _F("Set (");
-  //     m += Flag::toString(comp);
-  //     m += ')';
-  //     // DEBUG_JSON(m.c_str(), m.length());
-  //   #endif
-  // #endif
+  #ifdef DEBUG_JSON
+    #ifdef DEBUG_USE_BP
+      BP_JSON(comp ? _F("CHRONO FLAGEVENT 1") : _F("CHRONO FLAGEVENT 0"));
+    #else
+      String m = _F("Chrono: FlagEvent ");
+      if(this->key != FSM_KEY_NULL) { m += '\''; m += this->key; m += "' "; }
+      m += _F("Set (");
+      m += Flag::toString(comp);
+      m += ')';
+      // DEBUG_JSON(m.c_str(), m.length());
+      DEBUG_JSON(m);
+    #endif
+  #endif
 
   this->flag->set(comp);
 }
@@ -160,7 +161,7 @@ void Chronograph::set(const fsm_timestamp_t& _val) {
   
   #ifdef DEBUG_JSON
     #ifdef DEBUG_USE_BP
-      BP_JSON();
+      BP_JSON("CHRONO SET " + timestampToString(val));
     #else
       String m = _F("Chrono: Set Time (");
 
@@ -230,7 +231,7 @@ IntervalCallback* Chronograph::addInterval(const fsm_timestamp_t& delta, const f
 
 IntervalCallback* Chronograph::addInterval(fsm_key_t key, const fsm_timestamp_t& delta, const fsm_timestamp_t& phase, typename ConditionalCallback<fsm_timestamp_t>::cb_compval_t cb, bool invert) { 
   unsigned int n = 0;
-  while(intervals[n] != nullptr) { n++; if(n > MAX_INTERVALS) { Serial.println("~"); return nullptr;}}
+  while(intervals[n] != nullptr) { n++; if(n > MAX_INTERVALS) { /*Serial.println("~");*/ return nullptr;}}
 
   intervals[n] = new IntervalCallback(key, delta, phase, (const void*)cb, CB_COMPVAL, invert);
 
@@ -263,7 +264,7 @@ IntervalCallback* Chronograph::addIntervalFlag(fsm_key_t key, const fsm_timestam
   while(intervals[n] != nullptr) { n++; if(n > MAX_INTERVALS) return nullptr;}
 
   intervals[n] = new FlagInterval(key, delta, phase, flag, invert);
-  if(intervals[n] == nullptr) {Serial.println('~'); return nullptr;}
+  if(intervals[n] == nullptr) {/*Serial.println('~');*/ return nullptr;}
 
   #ifdef DEBUG_JSON
     #ifdef DEBUG_USE_BP
