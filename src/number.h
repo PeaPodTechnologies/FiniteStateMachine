@@ -70,6 +70,18 @@ class Number {
     Number operator*(const Number& rhs) const;
     Number operator/(const Number& rhs) const;
 
+    // Number++
+    Number& operator++() { value+=1; return *this; }
+    // ++Number
+    Number operator++(int) { Number temp = *this; value+=1; return temp; }
+
+    // Number--
+    Number& operator--() { value-=1; return *this; }
+    // --Number
+    Number operator--(int) { Number temp = *this; value-=1; return temp; }
+
+    // Number{+-*/}= operators i.e. n += 2 are implicit in Number{+-*/} operators
+
     static const Number& minimum(const Number& a, const Number& b);
 
     static const Number& maximum(const Number& a, const Number& b);
