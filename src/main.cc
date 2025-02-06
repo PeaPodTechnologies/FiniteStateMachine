@@ -42,6 +42,8 @@
 #define DISCO_CYCLE_MS 2000
 #endif
 
+using namespace FSM;
+
 // #define DELAY_PHOTO_FLASH   // 
 // #define PERIOD_LIGHTING
 

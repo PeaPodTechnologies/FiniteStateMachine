@@ -6,7 +6,7 @@
 
 #define MAX_INTERVALS 16
 #define INTERVAL_RESET_WINDOW 1.05
-#define TWENTYFOURHRS_MILLIS ((fsm_timestamp_t)86400000)
+#define TWENTYFOURHRS_MILLIS ((FSM::fsm_timestamp_t)86400000)
 
 namespace FSM {
 
