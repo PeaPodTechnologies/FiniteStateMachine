@@ -3,6 +3,8 @@
 #include <debug.h>
 #include <number.h>
 
+using namespace FSM;
+
 // String FSM_KEY_NULL = String();
 fsm_key_t FSM_KEY_NULL = nullptr;
 
@@ -10,9 +12,9 @@ template <> ConditionalCallback<bool>::~ConditionalCallback() { }
 template <> ConditionalCallback<Number>::~ConditionalCallback() { }
 template <> ConditionalCallback<fsm_timestamp_t>::~ConditionalCallback() { }
 
-template <> String stateToString<bool>(const bool& val) { return val ? _F("true") : _F("false"); }
-template <> String stateToString<Number>(const Number& val) { return val.toString(); }
-template <> String stateToString<fsm_timestamp_t>(const fsm_timestamp_t& val) { return timestampToString(val); }
+template <> String FSM::stateToString<bool>(const bool& val) { return val ? _F("true") : _F("false"); }
+template <> String FSM::stateToString<Number>(const Number& val) { return val.toString(); }
+template <> String FSM::stateToString<fsm_timestamp_t>(const fsm_timestamp_t& val) { return timestampToString(val); }
 
 template <> bool ConditionalCallback<bool>::compare(comparators_t cmp, const bool& val, const bool& ref) {
   bool result = false;

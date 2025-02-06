@@ -5,8 +5,10 @@
 #include <state.h>
 #include <comparators.h>
 
+using namespace FSM;
+
 const char* key_chronograph = {"Chronograph"};
-Chronograph Chronos = Chronograph();
+Chronograph FSM::Chronos = Chronograph();
 
 IntervalCallback::IntervalCallback(const fsm_timestamp_t& delta, const void* cb, callback_type_t cbtype, bool invert) : now(delta), delta(delta), ConditionalCallback<fsm_timestamp_t>(CMP_GTR, delta, cb, cbtype, invert) { }
 

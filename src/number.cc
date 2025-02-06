@@ -5,7 +5,9 @@
 
 #include <debug.h>
 
-String timestampToString(const fsm_timestamp_t& val) {
+using namespace FSM;
+
+String FSM::timestampToString(const fsm_timestamp_t& val) {
   unsigned long seconds_tot = val / 1000;
   unsigned long res_ms = val % 1000;
   unsigned long minutes_tot = seconds_tot / 60;

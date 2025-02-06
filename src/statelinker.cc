@@ -5,6 +5,8 @@
 #include <comparators.h>
 #include <number.h>
 
+using namespace FSM;
+
 BangBangFlagSet::BangBangFlagSet(const Number& lo, const Number& hi, Flag* flag) : low(Number::minimum(lo, hi)), high(Number::maximum(lo, hi)), FlagSetCondition<Number>(CMP_LES, low, flag, (double)hi < (double)lo) {
   // #ifdef DEBUG_JSON
   //   #ifdef DEBUG_USE_BP

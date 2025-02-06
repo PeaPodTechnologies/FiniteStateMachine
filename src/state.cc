@@ -6,6 +6,8 @@
 #include <comparators.h>
 #include <number.h>
 
+using namespace FSM;
+
 // template <> String State<bool>::toString(const bool& val) { return (val ? _F("true") : _F("false")); }
 // template <> String State<bool>::toString(void) { return State<bool>::toString(this->value); }
 

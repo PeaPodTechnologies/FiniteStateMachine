@@ -5,88 +5,92 @@
 
 #include <Arduino.h>
 
-// Timestamps are numbers too :)
+namespace FSM {
 
-typedef unsigned long fsm_timestamp_t;
+  // Timestamps are numbers too :)
 
-String timestampToString(const fsm_timestamp_t& val);
+  typedef unsigned long fsm_timestamp_t;
 
-class Number {
-  private:
-    double value;
-    bool isFloating;
-    bool isSigned;
-    bool notanumber = false;
+  String timestampToString(const fsm_timestamp_t& val);
 
-  protected:
-    int compare(const Number& other) const;
+  class Number {
+    private:
+      double value;
+      bool isFloating;
+      bool isSigned;
+      bool notanumber = false;
 
-    // float getValue(void);
-    // float isFloatingPoint(void);
-    // float isSignedInteger(void);
+    protected:
+      int compare(const Number& other) const;
 
-    void set(const double& val, bool isFloating = true, bool isSigned = true);
-    void setValue(const long& val);
-    void setValue(const unsigned long& val);
+      // float getValue(void);
+      // float isFloatingPoint(void);
+      // float isSignedInteger(void);
 
-  public:
-    Number(); // NaN Constructor
-    Number(const double& val, bool isFloating = true, bool isSigned = true);
-    Number(const int& val);
-    Number(const long& val);
-    Number(const unsigned long& val);
-    Number(const Number& other);
+      void set(const double& val, bool isFloating = true, bool isSigned = true);
+      void setValue(const long& val);
+      void setValue(const unsigned long& val);
 
-    ~Number();
+    public:
+      Number(); // NaN Constructor
+      Number(const double& val, bool isFloating = true, bool isSigned = true);
+      Number(const int& val);
+      Number(const long& val);
+      Number(const unsigned long& val);
+      Number(const Number& other);
 
-    bool isNaN(void) const;
+      ~Number();
 
-    double operator()(void) const;
+      bool isNaN(void) const;
 
-    void operator=(const double& rhs);
-    void operator=(const float& rhs);
-    void operator=(const long& rhs);
-    void operator=(const int& rhs);
-    void operator=(const unsigned long& rhs);
-    void operator=(const unsigned int& rhs);
+      double operator()(void) const;
 
-    Number& operator=(const Number& other);
+      void operator=(const double& rhs);
+      void operator=(const float& rhs);
+      void operator=(const long& rhs);
+      void operator=(const int& rhs);
+      void operator=(const unsigned long& rhs);
+      void operator=(const unsigned int& rhs);
 
-    bool operator==(const Number& rhs) const;
-    bool operator!=(const Number& rhs) const;
+      Number& operator=(const Number& other);
 
-    bool operator<(const Number& rhs) const;
-    bool operator<=(const Number& rhs) const;
-    bool operator>(const Number& rhs) const;
-    bool operator>=(const Number& rhs) const;
+      bool operator==(const Number& rhs) const;
+      bool operator!=(const Number& rhs) const;
 
-    operator double() const;
-    explicit operator fsm_timestamp_t()  const;
-    // operator long() const;
-    // operator int() const;
+      bool operator<(const Number& rhs) const;
+      bool operator<=(const Number& rhs) const;
+      bool operator>(const Number& rhs) const;
+      bool operator>=(const Number& rhs) const;
 
-    Number operator+(const Number& rhs) const;
-    Number operator-(const Number& rhs) const;
-    Number operator*(const Number& rhs) const;
-    Number operator/(const Number& rhs) const;
+      operator double() const;
+      explicit operator fsm_timestamp_t()  const;
+      // operator long() const;
+      // operator int() const;
 
-    // Number++
-    Number& operator++() { value+=1; return *this; }
-    // ++Number
-    Number operator++(int) { Number temp = *this; value+=1; return temp; }
+      Number operator+(const Number& rhs) const;
+      Number operator-(const Number& rhs) const;
+      Number operator*(const Number& rhs) const;
+      Number operator/(const Number& rhs) const;
 
-    // Number--
-    Number& operator--() { value-=1; return *this; }
-    // --Number
-    Number operator--(int) { Number temp = *this; value-=1; return temp; }
+      // Number++
+      Number& operator++() { value+=1; return *this; }
+      // ++Number
+      Number operator++(int) { Number temp = *this; value+=1; return temp; }
 
-    // Number{+-*/}= operators i.e. n += 2 are implicit in Number{+-*/} operators
+      // Number--
+      Number& operator--() { value-=1; return *this; }
+      // --Number
+      Number operator--(int) { Number temp = *this; value-=1; return temp; }
 
-    static const Number& minimum(const Number& a, const Number& b);
+      // Number{+-*/}= operators i.e. n += 2 are implicit in Number{+-*/} operators
 
-    static const Number& maximum(const Number& a, const Number& b);
+      static const Number& minimum(const Number& a, const Number& b);
 
-    String toString(uint8_t floating = 2) const;
+      static const Number& maximum(const Number& a, const Number& b);
+
+      String toString(uint8_t floating = 2) const;
+  };
+
 };
 
 #endif

@@ -6,212 +6,215 @@
 #define NOP_COMP_BOOL true
 #define NOP_COMP_NUMBER false
 
-typedef enum {
-  CMP_NOP = 0,
-  CMP_EQU,
-  CMP_NEQ,
-  CMP_LES,
-  CMP_LEQ,
-  CMP_GTR,
-  CMP_GEQ,
-} comparators_t;
+namespace FSM {
 
-// Helper Functions
-const char* parseComparator(const comparators_t& cmp, bool result = true);
+  typedef enum {
+    CMP_NOP = 0,
+    CMP_EQU,
+    CMP_NEQ,
+    CMP_LES,
+    CMP_LEQ,
+    CMP_GTR,
+    CMP_GEQ,
+  } comparators_t;
 
-template <typename T> String stateToString(const T& val);
+  // Helper Functions
+  const char* parseComparator(const comparators_t& cmp, bool result = true);
 
-typedef enum {
-  CB_NONE = 0,   // void (* const)(void) - NO ARGS
-  CB_COMP,       // void (* const)(bool) - ADD: CONDITION RESULT
-  CB_COMPVAL,    // void (* const)(bool, T) - ADD: PASSED VALUE
-  CB_COMPVALREF, // void (* const)(bool, T, T) - ADD: REFERENCE VALUE
-} callback_type_t;
+  template <typename T> String stateToString(const T& val);
 
-// typedef const String fsm_key_t;
-typedef const char* fsm_key_t;
+  typedef enum {
+    CB_NONE = 0,   // void (* const)(void) - NO ARGS
+    CB_COMP,       // void (* const)(bool) - ADD: CONDITION RESULT
+    CB_COMPVAL,    // void (* const)(bool, T) - ADD: PASSED VALUE
+    CB_COMPVALREF, // void (* const)(bool, T, T) - ADD: REFERENCE VALUE
+  } callback_type_t;
 
-extern fsm_key_t FSM_KEY_NULL;
+  // typedef const String fsm_key_t;
+  typedef const char* fsm_key_t;
 
-// template <typename A> struct conditional_callbacks_t {
-//   typedef ;
-//   typedef ;
-//   typedef );
-//   typedef void (* const cb_ref_t)(bool comp, A val, A ref);
-//   typedef A (* const cb_getref_t)(void);
-// };
+  extern fsm_key_t FSM_KEY_NULL;
 
-// TODO: Compound conditionals?
+  // template <typename A> struct conditional_callbacks_t {
+  //   typedef ;
+  //   typedef ;
+  //   typedef );
+  //   typedef void (* const cb_ref_t)(bool comp, A val, A ref);
+  //   typedef A (* const cb_getref_t)(void);
+  // };
 
-// CONSTRUCTION: 
+  // TODO: Compound conditionals?
 
-// USE: CONDITION - COMPARISON OF VALUE <TYPE T> TO REFERENCE
-// IF TRUE: EXECUTION
+  // CONSTRUCTION: 
 
-/**
- * @param T type of the two values to be compared
-*/
-template <typename T> class ConditionalCallback {
-  public:
-    typedef const T& (* cb_getref_t)(const T&);
-    typedef void (* const cb_none_t)(void);
-    typedef void (* const cb_comp_t)(bool);
-    typedef void (* const cb_compval_t)(bool, const T&);
-    typedef void (* const cb_compvalref_t)(bool, const T&, const T&);
+  // USE: CONDITION - COMPARISON OF VALUE <TYPE T> TO REFERENCE
+  // IF TRUE: EXECUTION
 
-    ~ConditionalCallback();
-    
-    /**
-     * @param cmp COMPARATOR
-     * @param ref REFERENCE VALUE <TYPE T>
-     * @param cb CALLBACK FUNCTION POINTER (CAST TO CONST VOID*)
-     * @param cbtype CALLBACK TYPE - dictates argument set, cb pointer recast
-     * REFERENCE UPDATOR (OPTIONAL)
-     **/
-    // const char* key, comparators_t cmp, const T& ref, bool invert, cb_getref_t getReference
-    ConditionalCallback(fsm_key_t key, comparators_t cmp, const T& ref, const void* cb, callback_type_t cbtype, cb_getref_t getReference = nullptr);
-    ConditionalCallback(fsm_key_t key, comparators_t cmp, const T& ref, cb_none_t cb, const T&(* const getReference)(const T&) = nullptr);
-    ConditionalCallback(fsm_key_t key, comparators_t cmp, const T& ref, cb_comp_t cb, cb_getref_t getReference = nullptr);
-    ConditionalCallback(fsm_key_t key, comparators_t cmp, const T& ref, cb_compval_t cb, cb_getref_t getReference = nullptr);
-    ConditionalCallback(fsm_key_t key, comparators_t cmp, const T& ref, cb_compvalref_t cb, cb_getref_t getReference = nullptr);
+  /**
+   * @param T type of the two values to be compared
+  */
+  template <typename T> class ConditionalCallback {
+    public:
+      typedef const T& (* cb_getref_t)(const T&);
+      typedef void (* const cb_none_t)(void);
+      typedef void (* const cb_comp_t)(bool);
+      typedef void (* const cb_compval_t)(bool, const T&);
+      typedef void (* const cb_compvalref_t)(bool, const T&, const T&);
 
-    ConditionalCallback(fsm_key_t key, comparators_t cmp, const T& ref, const void* cb, callback_type_t cbtype, bool invert, cb_getref_t getReference = nullptr);
-    ConditionalCallback(fsm_key_t key, comparators_t cmp, const T& ref, cb_none_t cb, bool invert, cb_getref_t getReference = nullptr);
-    ConditionalCallback(fsm_key_t key, comparators_t cmp, const T& ref, cb_comp_t cb, bool invert, cb_getref_t getReference = nullptr);
-    ConditionalCallback(fsm_key_t key, comparators_t cmp, const T& ref, cb_compval_t cb, bool invert, cb_getref_t getReference = nullptr);
-    ConditionalCallback(fsm_key_t key, comparators_t cmp, const T& ref, cb_compvalref_t  cb, bool invert, cb_getref_t getReference = nullptr);
+      ~ConditionalCallback();
+      
+      /**
+       * @param cmp COMPARATOR
+       * @param ref REFERENCE VALUE <TYPE T>
+       * @param cb CALLBACK FUNCTION POINTER (CAST TO CONST VOID*)
+       * @param cbtype CALLBACK TYPE - dictates argument set, cb pointer recast
+       * REFERENCE UPDATOR (OPTIONAL)
+       **/
+      // const char* key, comparators_t cmp, const T& ref, bool invert, cb_getref_t getReference
+      ConditionalCallback(fsm_key_t key, comparators_t cmp, const T& ref, const void* cb, callback_type_t cbtype, cb_getref_t getReference = nullptr);
+      ConditionalCallback(fsm_key_t key, comparators_t cmp, const T& ref, cb_none_t cb, const T&(* const getReference)(const T&) = nullptr);
+      ConditionalCallback(fsm_key_t key, comparators_t cmp, const T& ref, cb_comp_t cb, cb_getref_t getReference = nullptr);
+      ConditionalCallback(fsm_key_t key, comparators_t cmp, const T& ref, cb_compval_t cb, cb_getref_t getReference = nullptr);
+      ConditionalCallback(fsm_key_t key, comparators_t cmp, const T& ref, cb_compvalref_t cb, cb_getref_t getReference = nullptr);
 
-    ConditionalCallback(comparators_t cmp, const T& ref, const void* cb, callback_type_t cbtype, cb_getref_t getReference = nullptr);
-    ConditionalCallback(comparators_t cmp, const T& ref, cb_none_t cb, const T&(* const getReference)(const T&) = nullptr);
-    ConditionalCallback(comparators_t cmp, const T& ref, cb_comp_t cb, cb_getref_t getReference = nullptr);
-    ConditionalCallback(comparators_t cmp, const T& ref, cb_compval_t cb, cb_getref_t getReference = nullptr);
-    ConditionalCallback(comparators_t cmp, const T& ref, cb_compvalref_t cb, cb_getref_t getReference = nullptr);
+      ConditionalCallback(fsm_key_t key, comparators_t cmp, const T& ref, const void* cb, callback_type_t cbtype, bool invert, cb_getref_t getReference = nullptr);
+      ConditionalCallback(fsm_key_t key, comparators_t cmp, const T& ref, cb_none_t cb, bool invert, cb_getref_t getReference = nullptr);
+      ConditionalCallback(fsm_key_t key, comparators_t cmp, const T& ref, cb_comp_t cb, bool invert, cb_getref_t getReference = nullptr);
+      ConditionalCallback(fsm_key_t key, comparators_t cmp, const T& ref, cb_compval_t cb, bool invert, cb_getref_t getReference = nullptr);
+      ConditionalCallback(fsm_key_t key, comparators_t cmp, const T& ref, cb_compvalref_t  cb, bool invert, cb_getref_t getReference = nullptr);
 
-    ConditionalCallback(comparators_t cmp, const T& ref, const void* cb, callback_type_t cbtype, bool invert, cb_getref_t getReference = nullptr);
-    ConditionalCallback(comparators_t cmp, const T& ref, cb_none_t cb, bool invert, cb_getref_t getReference = nullptr);
-    ConditionalCallback(comparators_t cmp, const T& ref, cb_comp_t cb, bool invert, cb_getref_t getReference = nullptr);
-    ConditionalCallback(comparators_t cmp, const T& ref, cb_compval_t cb, bool invert, cb_getref_t getReference = nullptr);
-    ConditionalCallback(comparators_t cmp, const T& ref, cb_compvalref_t  cb, bool invert, cb_getref_t getReference = nullptr);
+      ConditionalCallback(comparators_t cmp, const T& ref, const void* cb, callback_type_t cbtype, cb_getref_t getReference = nullptr);
+      ConditionalCallback(comparators_t cmp, const T& ref, cb_none_t cb, const T&(* const getReference)(const T&) = nullptr);
+      ConditionalCallback(comparators_t cmp, const T& ref, cb_comp_t cb, cb_getref_t getReference = nullptr);
+      ConditionalCallback(comparators_t cmp, const T& ref, cb_compval_t cb, cb_getref_t getReference = nullptr);
+      ConditionalCallback(comparators_t cmp, const T& ref, cb_compvalref_t cb, cb_getref_t getReference = nullptr);
 
-    ConditionalCallback<T>& operator=(ConditionalCallback<T> const& other);
+      ConditionalCallback(comparators_t cmp, const T& ref, const void* cb, callback_type_t cbtype, bool invert, cb_getref_t getReference = nullptr);
+      ConditionalCallback(comparators_t cmp, const T& ref, cb_none_t cb, bool invert, cb_getref_t getReference = nullptr);
+      ConditionalCallback(comparators_t cmp, const T& ref, cb_comp_t cb, bool invert, cb_getref_t getReference = nullptr);
+      ConditionalCallback(comparators_t cmp, const T& ref, cb_compval_t cb, bool invert, cb_getref_t getReference = nullptr);
+      ConditionalCallback(comparators_t cmp, const T& ref, cb_compvalref_t  cb, bool invert, cb_getref_t getReference = nullptr);
 
-    void operator()(const T& val);
-    void operator()(const T& val, const T& ref);
+      ConditionalCallback<T>& operator=(ConditionalCallback<T> const& other);
 
-    static bool compare(comparators_t cmp, const T& val, const T& ref);
+      void operator()(const T& val);
+      void operator()(const T& val, const T& ref);
 
-    void disable();
-    void enable();
-    void enable(const T& val);
+      static bool compare(comparators_t cmp, const T& val, const T& ref);
 
-    fsm_key_t getKey() const { return this->key; }
+      void disable();
+      void enable();
+      void enable(const T& val);
 
-  protected:
-    // NO CALLBACK - ASSUMES childCallback is implemented
-    ConditionalCallback(comparators_t cmp, const T& ref, cb_getref_t getReference = nullptr);
-    ConditionalCallback(comparators_t cmp, const T& ref, bool invert, cb_getref_t getReference = nullptr);
-    ConditionalCallback(fsm_key_t key, comparators_t cmp, const T& ref, cb_getref_t getReference = nullptr);
-    ConditionalCallback(fsm_key_t key, comparators_t cmp, const T& ref, bool invert, cb_getref_t getReference = nullptr);
+      fsm_key_t getKey() const { return this->key; }
 
-    // static String nullKey = String();
-    fsm_key_t key;
+    protected:
+      // NO CALLBACK - ASSUMES childCallback is implemented
+      ConditionalCallback(comparators_t cmp, const T& ref, cb_getref_t getReference = nullptr);
+      ConditionalCallback(comparators_t cmp, const T& ref, bool invert, cb_getref_t getReference = nullptr);
+      ConditionalCallback(fsm_key_t key, comparators_t cmp, const T& ref, cb_getref_t getReference = nullptr);
+      ConditionalCallback(fsm_key_t key, comparators_t cmp, const T& ref, bool invert, cb_getref_t getReference = nullptr);
 
-    // FALLBACKS FOR FUNCPOINTERS
-    virtual void childCallback(bool comp, const T& val, const T& ref); // NOP
-    virtual const T& childReference(const T& val); // NOP
+      // static String nullKey = String();
+      fsm_key_t key;
 
-    // PROPERTIES
+      // FALLBACKS FOR FUNCPOINTERS
+      virtual void childCallback(bool comp, const T& val, const T& ref); // NOP
+      virtual const T& childReference(const T& val); // NOP
 
-    void setComparator(comparators_t cmp);
+      // PROPERTIES
 
-    comparators_t comparator;
+      void setComparator(comparators_t cmp);
 
-    virtual void callOperator(const T& val, const T& ref);
+      comparators_t comparator;
 
-    T reference;
+      virtual void callOperator(const T& val, const T& ref);
 
-    const bool invert = false;
+      T reference;
 
-    bool disabled = false;
+      const bool invert = false;
 
-    const void* callback;
+      bool disabled = false;
 
-    const callback_type_t callbacktype;
+      const void* callback;
 
-    const cb_getref_t getReference = nullptr;
+      const callback_type_t callbacktype;
 
-    void executeCallback(const T& val, const T& ref);
-};
+      const cb_getref_t getReference = nullptr;
 
-class BangBangConditional : public ConditionalCallback<Number> {
-  private:
-    bool state = false;
+      void executeCallback(const T& val, const T& ref);
+  };
 
-    // Has the callback been triggered yet?
-    bool triggered = false;
+  class BangBangConditional : public ConditionalCallback<Number> {
+    private:
+      bool state = false;
 
-    const Number low;
-    const Number high;
+      // Has the callback been triggered yet?
+      bool triggered = false;
 
-    const void* rising;
-    const void* falling;
+      const Number low;
+      const Number high;
 
-    const callback_type_t latchcbtype;
+      const void* rising;
+      const void* falling;
 
-  protected:
-    void childCallback(bool comp, const Number& val, const Number& ref) override;
-    const Number& childReference(const Number& val) override;
-    void callOperator(const Number& val, const Number& ref) override;
-  public:
-    /**
-     * When val < `lo`, callback(true)
-     * When val > `hi`, callback(false)
-     * `invert` inverts argument value
-     * Args are parsed with min/max so that hi > lo
-    */
-    BangBangConditional(const Number& lo, const Number& hi, cb_none_t rising, cb_none_t falling);
-    BangBangConditional(const Number& lo, const Number& hi, const void* rising, const void* falling, callback_type_t cbtype);
-    BangBangConditional(const Number& lo, const Number& hi, cb_none_t cb);
-    BangBangConditional(const Number& lo, const Number& hi, const void* cb, callback_type_t cbtype);
+      const callback_type_t latchcbtype;
 
-    BangBangConditional(fsm_key_t key, const Number& lo, const Number& hi, cb_none_t rising, cb_none_t falling);
-    BangBangConditional(fsm_key_t key, const Number& lo, const Number& hi, const void* rising, const void* falling, callback_type_t cbtype);
-    BangBangConditional(fsm_key_t key, const Number& lo, const Number& hi, cb_none_t cb);
-    BangBangConditional(fsm_key_t key, const Number& lo, const Number& hi, const void* cb, callback_type_t cbtype);
-};
+    protected:
+      void childCallback(bool comp, const Number& val, const Number& ref) override;
+      const Number& childReference(const Number& val) override;
+      void callOperator(const Number& val, const Number& ref) override;
+    public:
+      /**
+       * When val < `lo`, callback(true)
+       * When val > `hi`, callback(false)
+       * `invert` inverts argument value
+       * Args are parsed with min/max so that hi > lo
+      */
+      BangBangConditional(const Number& lo, const Number& hi, cb_none_t rising, cb_none_t falling);
+      BangBangConditional(const Number& lo, const Number& hi, const void* rising, const void* falling, callback_type_t cbtype);
+      BangBangConditional(const Number& lo, const Number& hi, cb_none_t cb);
+      BangBangConditional(const Number& lo, const Number& hi, const void* cb, callback_type_t cbtype);
 
-class LatchingConditional : public ConditionalCallback<bool> {
-  private:
-    bool state = true;
+      BangBangConditional(fsm_key_t key, const Number& lo, const Number& hi, cb_none_t rising, cb_none_t falling);
+      BangBangConditional(fsm_key_t key, const Number& lo, const Number& hi, const void* rising, const void* falling, callback_type_t cbtype);
+      BangBangConditional(fsm_key_t key, const Number& lo, const Number& hi, cb_none_t cb);
+      BangBangConditional(fsm_key_t key, const Number& lo, const Number& hi, const void* cb, callback_type_t cbtype);
+  };
 
-    // Has the callback been triggered yet?
-    bool triggered = false;
+  class LatchingConditional : public ConditionalCallback<bool> {
+    private:
+      bool state = true;
 
-    const void* rising;
-    const void* falling;
+      // Has the callback been triggered yet?
+      bool triggered = false;
 
-    const callback_type_t latchcbtype;
+      const void* rising;
+      const void* falling;
 
-  protected:
-    void childCallback(bool comp, const bool& val, const bool& ref) override;
-    const bool& childReference(const bool& val) override;
-    void callOperator(const bool& val, const bool& ref) override;
-  public:
-    LatchingConditional(cb_none_t rising, cb_none_t falling, bool invert = false);
-    LatchingConditional(const void* rising, const void* falling, callback_type_t cbtype, bool invert = false);
-    explicit LatchingConditional(cb_none_t cb, bool invert = false);
-    LatchingConditional(const void* cb, callback_type_t cbtype, bool invert = false);
-    
-    LatchingConditional(cb_comp_t rising, cb_comp_t falling, bool invert = false);
-    explicit LatchingConditional(cb_comp_t cb, bool invert = false);
+      const callback_type_t latchcbtype;
 
-    LatchingConditional(fsm_key_t key, cb_none_t rising, cb_none_t falling, bool invert = false);
-    LatchingConditional(fsm_key_t key, const void* rising, const void* falling, callback_type_t cbtype, bool invert = false);
-    LatchingConditional(fsm_key_t key, cb_none_t cb, bool invert = false);
-    LatchingConditional(fsm_key_t key, const void* cb, callback_type_t cbtype, bool invert = false);
+    protected:
+      void childCallback(bool comp, const bool& val, const bool& ref) override;
+      const bool& childReference(const bool& val) override;
+      void callOperator(const bool& val, const bool& ref) override;
+    public:
+      LatchingConditional(cb_none_t rising, cb_none_t falling, bool invert = false);
+      LatchingConditional(const void* rising, const void* falling, callback_type_t cbtype, bool invert = false);
+      explicit LatchingConditional(cb_none_t cb, bool invert = false);
+      LatchingConditional(const void* cb, callback_type_t cbtype, bool invert = false);
+      
+      LatchingConditional(cb_comp_t rising, cb_comp_t falling, bool invert = false);
+      explicit LatchingConditional(cb_comp_t cb, bool invert = false);
 
-    LatchingConditional(fsm_key_t key, cb_comp_t rising, cb_comp_t falling, bool invert = false);
-    LatchingConditional(fsm_key_t key, cb_comp_t cb, bool invert = false);
+      LatchingConditional(fsm_key_t key, cb_none_t rising, cb_none_t falling, bool invert = false);
+      LatchingConditional(fsm_key_t key, const void* rising, const void* falling, callback_type_t cbtype, bool invert = false);
+      LatchingConditional(fsm_key_t key, cb_none_t cb, bool invert = false);
+      LatchingConditional(fsm_key_t key, const void* cb, callback_type_t cbtype, bool invert = false);
+
+      LatchingConditional(fsm_key_t key, cb_comp_t rising, cb_comp_t falling, bool invert = false);
+      LatchingConditional(fsm_key_t key, cb_comp_t cb, bool invert = false);
+  };
 };
 
 #include <comparators.tpp>
