@@ -33,7 +33,7 @@ namespace FSM {
   // typedef const String fsm_key_t;
   typedef const char* fsm_key_t;
 
-  extern fsm_key_t FSM_KEY_NULL;
+  const fsm_key_t FSM_KEY_NULL = nullptr;
 
   // template <typename A> struct conditional_callbacks_t {
   //   typedef ;

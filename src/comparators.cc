@@ -5,9 +5,6 @@
 
 using namespace FSM;
 
-// String FSM_KEY_NULL = String();
-fsm_key_t FSM_KEY_NULL = nullptr;
-
 template <> ConditionalCallback<bool>::~ConditionalCallback() { }
 template <> ConditionalCallback<Number>::~ConditionalCallback() { }
 template <> ConditionalCallback<fsm_timestamp_t>::~ConditionalCallback() { }
@@ -408,7 +405,7 @@ void LatchingConditional::childCallback(bool comp, const bool& val, const bool& 
 
 const bool& LatchingConditional::childReference(const bool& val) { return this->state; }
 
-const char* parseComparator(const comparators_t& cmp, bool result) {
+const char* FSM::parseComparator(const comparators_t& cmp, bool result) {
   switch(cmp) {
     case CMP_EQU:
       return result ? "==" : "!==";
