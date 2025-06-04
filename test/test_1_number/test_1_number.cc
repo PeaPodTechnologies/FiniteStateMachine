@@ -13,8 +13,6 @@ void test_number_create(void) {
   numbers[2] = Number(-4);
   numbers[3] = Number(-52.61);
 
-  Serial.println(((double)numbers[0]));
-
   // 1. Value
   TEST_ASSERT_EQUAL_FLOAT(13.0, ((double)numbers[0]));
   TEST_ASSERT_EQUAL_FLOAT(6.2, ((double)numbers[1]));
@@ -22,19 +20,31 @@ void test_number_create(void) {
   TEST_ASSERT_EQUAL_FLOAT(-52.61, ((double)numbers[3]));
 
   // 2. String Representation
-  // char buf[10] = { '\0' };
+  String s;
 
-  // numbers[0].toString(buf);
-  // TEST_ASSERT_EQUAL_STRING("13", buf);
+  s = numbers[0].toString();
+  TEST_ASSERT_EQUAL_STRING("13", s.c_str());
+
+  s = numbers[1].toString();
+  TEST_ASSERT_EQUAL_STRING("6.2", s.c_str());
   
-  // numbers[1].toString(buf);
-  // TEST_ASSERT_EQUAL_STRING("6.20", buf);
+  s = numbers[2].toString();
+  TEST_ASSERT_EQUAL_STRING("-4", s.c_str());
   
-  // numbers[2].toString(buf);
-  // TEST_ASSERT_EQUAL_STRING("-4", buf);
-  
-  // numbers[3].toString(buf);
-  // TEST_ASSERT_EQUAL_STRING("-52.61", buf);
+  s = numbers[3].toString();
+  TEST_ASSERT_EQUAL_STRING("-52.61", s.c_str());
+}
+
+void test_number_comparisons(void) {
+  // 3. Comparisons
+  TEST_ASSERT_TRUE(numbers[0] > numbers[1]);
+  TEST_ASSERT_TRUE(numbers[1] < numbers[0]);
+
+  TEST_ASSERT_TRUE(numbers[1] > numbers[2]);
+  TEST_ASSERT_TRUE(numbers[2] < numbers[1]);
+
+  TEST_ASSERT_TRUE(numbers[2] > numbers[3]);
+  TEST_ASSERT_TRUE(numbers[3] < numbers[2]);
 }
 
 void setup() {
@@ -44,7 +54,7 @@ void setup() {
 
   UNITY_BEGIN();
   RUN_TEST(test_number_create);
-  // RUN_TEST(test_number_comparisons);
+  RUN_TEST(test_number_comparisons);
   // RUN_TEST(test_number_operations);
 
   UNITY_END();
