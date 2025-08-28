@@ -4,7 +4,7 @@
 
 #include <Arduino.h>
 
-#include <debug.h>
+#include <debug_fsm.h>
 #include <chronograph.h>
 
 // #include <avr/wdt.h>

@@ -1,6 +1,6 @@
 #include <comparators.h>
 
-#include <debug.h>
+#include <debug_fsm.h>
 #include <number.h>
 
 using namespace FSM;

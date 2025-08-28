@@ -3,7 +3,7 @@
 #include <Arduino.h>
 #include <math.h>
 
-#include <debug.h>
+#include <debug_fsm.h>
 
 using namespace FSM;
 

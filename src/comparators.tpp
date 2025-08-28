@@ -10,7 +10,7 @@
 
 // #error COMPARATORS.TPP
 
-#include <debug.h>
+#include <debug_fsm.h>
 
 // TODO: All T args in callbacks -> const T&
 // TODO: Replace all OneShot with Latching (duh)

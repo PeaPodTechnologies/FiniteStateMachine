@@ -1,6 +1,6 @@
 #include <statelinker.h>
 
-#include <debug.h>
+#include <debug_fsm.h>
 #include <state.h>
 #include <comparators.h>
 #include <number.h>

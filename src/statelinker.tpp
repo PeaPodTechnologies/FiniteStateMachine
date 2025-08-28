@@ -14,7 +14,7 @@
 #ifndef FSM_STATELINKER_T_
 #define FSM_STATELINKER_T_
 
-#include <debug.h>
+#include <debug_fsm.h>
 
 // #error STATELINKER.TPP
 

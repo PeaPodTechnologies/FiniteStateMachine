@@ -70,7 +70,6 @@ namespace FSM {
   class Chronograph : protected State<fsm_timestamp_t> {
     private:
       const fsm_timestamp_t start;
-      const fsm_timestamp_t last;
 
       IntervalCallback* intervals[MAX_INTERVALS] = { nullptr };
     public:

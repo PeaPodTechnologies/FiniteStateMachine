@@ -1,14 +1,14 @@
 #include <chronograph.h>
 
-#include <debug.h>
+#include <debug_fsm.h>
 
 #include <state.h>
 #include <comparators.h>
 
-using namespace FSM;
-
 const char* key_chronograph = {"Chronograph"};
-Chronograph FSM::Chronos = Chronograph();
+FSM::Chronograph FSM::Chronos = FSM::Chronograph();
+
+using namespace FSM;
 
 IntervalCallback::IntervalCallback(const fsm_timestamp_t& delta, const void* cb, callback_type_t cbtype, bool invert) : now(delta), delta(delta), ConditionalCallback<fsm_timestamp_t>(CMP_GTR, delta, cb, cbtype, invert) { }
 
@@ -146,7 +146,7 @@ void FlagEvent::childCallback(bool comp, const fsm_timestamp_t& val, const fsm_t
   this->flag->set(comp);
 }
 
-Chronograph::Chronograph(const fsm_timestamp_t& start) : start(start), last(start), State<fsm_timestamp_t>(start, key_chronograph) { 
+Chronograph::Chronograph(const fsm_timestamp_t& start) : start(start), State<fsm_timestamp_t>(start, key_chronograph) { 
   // Blank it
   for(int i = 0; i < MAX_INTERVALS; i++) {
     this->intervals[i] = nullptr;
@@ -154,12 +154,7 @@ Chronograph::Chronograph(const fsm_timestamp_t& start) : start(start), last(star
 }
 
 void Chronograph::set(const fsm_timestamp_t& _val) {
-  fsm_timestamp_t val = _val % TWENTYFOURHRS_MILLIS;
-
-  const fsm_timestamp_t last = this->get();
-
-  // Null frame
-  const fsm_timestamp_t delta = val > last ? val - last : 0;
+  const fsm_timestamp_t val = _val % TWENTYFOURHRS_MILLIS;
   
   #ifdef DEBUG_JSON
     #ifdef DEBUG_USE_BP
@@ -176,18 +171,23 @@ void Chronograph::set(const fsm_timestamp_t& _val) {
     #endif
   #endif
 
+  const fsm_timestamp_t last = State<fsm_timestamp_t>::get();
+
   // Call super - let getRef handle overflow ;)
-  ((State<fsm_timestamp_t>*)this)->set(val);
+  State<fsm_timestamp_t>::set(val);
+
+  // Null frame
+  const fsm_timestamp_t delta = (val > last) ? val - last : 0;
 
   for(unsigned int i = 0; i < MAX_INTERVALS; i++) {
-    if(this->intervals[i] == nullptr) return;
+    if(this->intervals[i] == nullptr) continue;
 
     const fsm_timestamp_t last = intervals[i]->get();
     this->intervals[i]->set(last + delta);
   }
 }
 
-fsm_timestamp_t Chronograph::get(void) { return ((State<fsm_timestamp_t>*)this)->get(); }
+fsm_timestamp_t Chronograph::get(void) { return State<fsm_timestamp_t>::get(); }
 
 ConditionalCallback<fsm_timestamp_t>* Chronograph::addEvent(const fsm_timestamp_t& timestamp, typename ConditionalCallback<fsm_timestamp_t>::cb_compval_t cb, bool invert) { return addConditional(new ChronoEvent(timestamp, cb, invert)); }
 ConditionalCallback<fsm_timestamp_t>* Chronograph::addEvent(fsm_key_t key, const fsm_timestamp_t& timestamp, typename ConditionalCallback<fsm_timestamp_t>::cb_compval_t cb, bool invert) { return addConditional(new ChronoEvent(key, timestamp, cb, invert)); }
@@ -233,7 +233,7 @@ IntervalCallback* Chronograph::addInterval(const fsm_timestamp_t& delta, const f
 
 IntervalCallback* Chronograph::addInterval(fsm_key_t key, const fsm_timestamp_t& delta, const fsm_timestamp_t& phase, typename ConditionalCallback<fsm_timestamp_t>::cb_compval_t cb, bool invert) { 
   unsigned int n = 0;
-  while(intervals[n] != nullptr) { n++; if(n > MAX_INTERVALS) { /*Serial.println("~");*/ return nullptr;}}
+  while(intervals[n] != nullptr) { n++; if(n >= MAX_INTERVALS) { /*Serial.println("~");*/ return nullptr;}}
 
   intervals[n] = new IntervalCallback(key, delta, phase, (const void*)cb, CB_COMPVAL, invert);
 
@@ -263,7 +263,7 @@ IntervalCallback* Chronograph::addIntervalFlag(const fsm_timestamp_t& delta, con
 
 IntervalCallback* Chronograph::addIntervalFlag(fsm_key_t key, const fsm_timestamp_t& delta, const fsm_timestamp_t& phase, Flag* flag, bool invert) { 
   unsigned int n = 0;
-  while(intervals[n] != nullptr) { n++; if(n > MAX_INTERVALS) return nullptr;}
+  while(intervals[n] != nullptr) { n++; if(n >= MAX_INTERVALS) return nullptr;}
 
   intervals[n] = new FlagInterval(key, delta, phase, flag, invert);
   if(intervals[n] == nullptr) {/*Serial.println('~');*/ return nullptr;}

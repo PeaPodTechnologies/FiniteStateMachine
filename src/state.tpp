@@ -15,7 +15,7 @@
 
 // #error STATE.TPP
 
-#include <debug.h>
+#include <debug_fsm.h>
 
 namespace FSM {
 
@@ -23,36 +23,39 @@ namespace FSM {
   template <typename T> String State<T>::toString(void) { return State<T>::toString(this->value); }
 
   template <typename T> State<T>::State(const T& value) : value(value), defaultValue(value), key(FSM_KEY_NULL) {
-    #ifdef DEBUG_JSON
-      #ifdef DEBUG_USE_BP
-        BP_JSON();
-      #else
-        String m = _F("New State = ");
-        m += State<T>::toString(value);
-        // DEBUG_JSON(m.c_str(), m.length());
-        DEBUG_JSON(m);
-      #endif
-    #endif
+    // #ifdef DEBUG_JSON
+    //   #ifdef DEBUG_USE_BP
+    //     BP_JSON();
+    //   #else
+    //     String m = _F("New State = ");
+    //     m += State<T>::toString(value);
+    //     // DEBUG_JSON(m.c_str(), m.length());
+    //     DEBUG_JSON(m);
+    //   #endif
+    // #endif
+    for(unsigned int i = 0; i < MAX_CONDITIONALS; i++) this->conditionals[i] = nullptr;
   }
   template <typename T> State<T>::State(const T& value, fsm_key_t key) : value(value), defaultValue(value), key(key) {
-    #ifdef DEBUG_JSON
-      #ifdef DEBUG_USE_BP
-        BP_JSON();
-      #else
-        String m = _F("New State '");
-        m += key;
-        m += "' = ";
-        m += State<T>::toString(value);
-        // DEBUG_JSON(m.c_str(), m.length());
-        DEBUG_JSON(m);
-      #endif
-    #endif
+    // #ifdef DEBUG_JSON
+    //   #ifdef DEBUG_USE_BP
+    //     BP_JSON();
+    //   #else
+    //     String m = _F("New State '");
+    //     m += key;
+    //     m += "' = ";
+    //     m += State<T>::toString(value);
+    //     // DEBUG_JSON(m.c_str(), m.length());
+    //     DEBUG_JSON(m);
+    //   #endif
+    // #endif
+    for(unsigned int i = 0; i < MAX_CONDITIONALS; i++) this->conditionals[i] = nullptr;
   }
 
   template <typename T> State<T>::~State() {
     for(unsigned int i = 0; i < MAX_CONDITIONALS; i++) {
       if(this->conditionals[i] != nullptr) {
         delete this->conditionals[i];
+        this->conditionals[i] = nullptr;
       }
     }
   }
@@ -87,7 +90,7 @@ namespace FSM {
 
     if(!this->disabled) {
       for(unsigned int i = 0; i < MAX_CONDITIONALS; i++) {
-        if(this->conditionals[i] == nullptr) break;
+        if(this->conditionals[i] == nullptr) continue;
         // delay(1); // Comment out to break the code
         this->conditionals[i]->operator()(val);
 
