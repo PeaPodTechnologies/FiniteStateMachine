@@ -91,6 +91,8 @@ namespace FSM {
       String toString(uint8_t floating = 2) const;
   };
 
+  const FSM::Number notanumber = FSM::Number();
+
 };
 
 #endif
