@@ -43,6 +43,8 @@ namespace FSM {
       T get(void);
       void set(const T& val);
 
+      void removeConditional(ConditionalCallback<T>* conditional);
+
       ConditionalCallback<T>* addConditional(ConditionalCallback<T>* conditional);
 
       ConditionalCallback<T>* addConditional(comparators_t cmp, const T& ref, typename ConditionalCallback<T>::cb_none_t cb, typename ConditionalCallback<T>::cb_getref_t getReference = nullptr);

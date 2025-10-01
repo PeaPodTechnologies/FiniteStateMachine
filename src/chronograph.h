@@ -75,6 +75,21 @@ namespace FSM {
     public:
       Chronograph(const fsm_timestamp_t& start = 1000);
 
+      void removeInterval(IntervalCallback* interval) {
+        if(interval == nullptr) return;
+        for(uint8_t i = 0; i < MAX_INTERVALS; i++) {
+          if(intervals[i] == interval) {
+            delete intervals[i];
+            intervals[i] = nullptr;
+            break;
+          }
+        }
+      }
+
+      void removeConditional(ConditionalCallback<fsm_timestamp_t>* conditional) {
+        State<fsm_timestamp_t>::removeConditional(conditional);
+      }
+
       ConditionalCallback<fsm_timestamp_t>* addEvent(const fsm_timestamp_t& timestamp, typename ConditionalCallback<fsm_timestamp_t>::cb_compval_t cb, bool invert = false);
       ConditionalCallback<fsm_timestamp_t>* addEvent(fsm_key_t key, const fsm_timestamp_t& timestamp, typename ConditionalCallback<fsm_timestamp_t>::cb_compval_t cb, bool invert = false);
 

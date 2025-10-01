@@ -113,6 +113,17 @@ namespace FSM {
     this->value = val;
   }
 
+  template <typename T> void State<T>::removeConditional(ConditionalCallback<T>* conditional) {
+    if(conditional == nullptr) return;
+    for(uint8_t i = 0; i < MAX_CONDITIONALS; i++) {
+      if(conditionals[i] == conditional) {
+        delete conditionals[i];
+        conditionals[i] = nullptr;
+        break;
+      }
+    }
+  }
+
   template <typename T> ConditionalCallback<T>* State<T>::addConditional(ConditionalCallback<T>* conditional) {
     for (unsigned char i = 0; i < MAX_CONDITIONALS; i++) {
       if(this->conditionals[i] == nullptr) {
