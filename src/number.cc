@@ -57,13 +57,14 @@ void Number::set(const double& val, bool isFloating, bool isSigned) {
   this->value = val; 
   this->isFloating = isFloating; 
   this->isSigned = isSigned;
+  this->notanumber = isnan(val);
 }
 
 void Number::setValue(const long& val) { this->set((double)val, false); }
 void Number::setValue(const unsigned long& val) { this->set((double)val, false, false); }
 
 // Master Constructor
-Number::Number(const double& val, bool isFloating, bool isSigned) : value(val), isFloating(isFloating), isSigned(isFloating || isSigned) { }
+Number::Number(const double& val, bool isFloating, bool isSigned) : value(val), isFloating(isFloating), isSigned(isFloating || isSigned), notanumber(isnan(val)) { }
 
 // NaN Constructor
 Number::Number() : value((double)NAN), isFloating(true), isSigned(true), notanumber(true) {
