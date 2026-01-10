@@ -158,13 +158,13 @@ Number Number::operator*(const Number& rhs) const {
   if(rhs.isNaN() || this->isNaN()) return Number();
 
   double result = rhs.value * this->value;
-  return Number(result, rhs.isFloating || this->isFloating, rhs.isSigned || this->isSigned); 
+  return Number(result, rhs.isFloating || this->isFloating, rhs.isSigned || this->isSigned || rhs.isFloating || this->isFloating); 
 }
 
 Number Number::operator/(const Number& rhs) const {
   if(rhs.isNaN() || this->isNaN()) return Number();
 
-  return (rhs.value < NUMBER_FLOP_EPSILON && rhs.value > -NUMBER_FLOP_EPSILON) ? Number() : Number(this->value / rhs.value, true, rhs.isSigned || this->isSigned); 
+  return (rhs.value < NUMBER_FLOP_EPSILON && rhs.value > -NUMBER_FLOP_EPSILON) ? Number() : Number(this->value / rhs.value, true, rhs.isSigned || this->isSigned || rhs.isFloating || this->isFloating); 
 }
 
 const Number& Number::minimum(const Number& a, const Number& b) { return a > b ? b : a; }
