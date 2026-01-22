@@ -88,6 +88,8 @@ namespace FSM {
       #endif
     #endif
 
+    this->value = val;
+
     if(!this->disabled) {
       for(unsigned int i = 0; i < MAX_CONDITIONALS; i++) {
         if(this->conditionals[i] == nullptr) continue;
@@ -109,8 +111,6 @@ namespace FSM {
     //     // DEBUG_JSON(m.c_str(), m.length());
     //   #endif
     // #endif
-
-    this->value = val;
   }
 
   template <typename T> void State<T>::removeConditional(ConditionalCallback<T>* conditional) {
