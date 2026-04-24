@@ -82,7 +82,7 @@ void setup() {
 
   // Construct States
   cycle = new Variable(Number(0, false, false), "Cycle");
-  cycle->addLoggerCallback(logCycle);
+  cycle->addCallback(logCycle);
 
   #ifdef ENABLE_LIGHTING
   lighting = new Flag(false, "Light");

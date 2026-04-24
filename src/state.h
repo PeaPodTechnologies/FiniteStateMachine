@@ -40,8 +40,8 @@ namespace FSM {
 
       fsm_key_t getKey() const { return this->key; }
 
-      T get(void);
-      void set(const T& val);
+      virtual T get(void);
+      virtual void set(const T& val);
 
       void removeConditional(ConditionalCallback<T>* conditional);
 
@@ -85,7 +85,7 @@ namespace FSM {
 
       // ConditionalCallback<T>* addConditionalResetFlag(comparators_t cmp, T ref, Flag* flag, bool oneshot = false);
 
-      ConditionalCallback<T>* addLoggerCallback(typename ConditionalCallback<T>::cb_compval_t cb);
+      ConditionalCallback<T>* addCallback(typename ConditionalCallback<T>::cb_compval_t cb);
 
       // virtual T get(void) = 0;
       // virtual void set(T val) = 0;

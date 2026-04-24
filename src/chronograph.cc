@@ -334,4 +334,4 @@ IntervalCallback* Chronograph::addTwentyFourTimeout(fsm_key_t key, const fsm_tim
   return intervals[n];
 }
 
-// ConditionalCallback<fsm_timestamp_t>* _Timer::addLoggerCallback(void (* const cb)(bool comp, fsm_timestamp_t val)) { return addConditional(new ConditionalCallback<fsm_timestamp_t>(CMP_NEQ, -1, cb)); }
+// ConditionalCallback<fsm_timestamp_t>* _Timer::addCallback(void (* const cb)(bool comp, fsm_timestamp_t val)) { return addConditional(new ConditionalCallback<fsm_timestamp_t>(CMP_NEQ, -1, cb)); }

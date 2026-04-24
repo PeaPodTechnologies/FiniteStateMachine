@@ -119,7 +119,7 @@ namespace FSM {
       String toString(void) { return Chronograph::toString(this->get()); }
       static String toString(const fsm_timestamp_t& val) { return timestampToString(val); }
 
-      // ConditionalCallback<fsm_timestamp_t>* addLoggerCallback(void (*cb)(bool, fsm_timestamp_t));
+      // ConditionalCallback<fsm_timestamp_t>* addCallback(void (*cb)(bool, fsm_timestamp_t));
   };
 
   extern Chronograph Chronos;

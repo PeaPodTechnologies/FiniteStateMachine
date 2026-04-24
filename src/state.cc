@@ -17,11 +17,11 @@ using namespace FSM;
 // template <> String State<fsm_timestamp_t>::toString(const fsm_timestamp_t& val) { return timestampToString(val); }
 // template <> String State<fsm_timestamp_t>::toString(void) { return State<fsm_timestamp_t>::toString(this->value); }
 
-template <> ConditionalCallback<Number>* State<Number>::addLoggerCallback(typename ConditionalCallback<Number>::cb_compval_t cb) { return addConditional(new ConditionalCallback<Number>(this->key, CMP_NEQ, Number(), cb)); }
+template <> ConditionalCallback<Number>* State<Number>::addCallback(typename ConditionalCallback<Number>::cb_compval_t cb) { return addConditional(new ConditionalCallback<Number>(this->key, CMP_NEQ, Number(), cb)); }
 
-template <> ConditionalCallback<fsm_timestamp_t>* State<fsm_timestamp_t>::addLoggerCallback(typename ConditionalCallback<fsm_timestamp_t>::cb_compval_t cb) { return addConditional(new ConditionalCallback<fsm_timestamp_t>(this->key, CMP_NEQ, (fsm_timestamp_t)-1, cb)); }
+template <> ConditionalCallback<fsm_timestamp_t>* State<fsm_timestamp_t>::addCallback(typename ConditionalCallback<fsm_timestamp_t>::cb_compval_t cb) { return addConditional(new ConditionalCallback<fsm_timestamp_t>(this->key, CMP_NEQ, (fsm_timestamp_t)-1, cb)); }
 
-template <> ConditionalCallback<bool>* State<bool>::addLoggerCallback(typename ConditionalCallback<bool>::cb_compval_t cb) { return addConditional(new ConditionalCallback<bool>(this->key, CMP_NOP, false, cb)); }
+template <> ConditionalCallback<bool>* State<bool>::addCallback(typename ConditionalCallback<bool>::cb_compval_t cb) { return addConditional(new ConditionalCallback<bool>(this->key, CMP_NOP, false, cb)); }
 
 template <> ConditionalCallback<Number>* State<Number>::addLatchingSetFlag(fsm_key_t key, const Number& on, const Number& off, Flag* flag) {
   return addConditional(new BangBangFlagSet(key, on, off, flag));
