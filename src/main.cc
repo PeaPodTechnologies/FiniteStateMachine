@@ -1,4 +1,5 @@
 #ifndef UNIT_TEST
+#ifndef IS_MAIN
 #define UNIT_TEST 1
 #define IS_MAIN 1
 
@@ -241,4 +242,5 @@ void scrollDisco(bool _, const fsm_timestamp_t& __) {
 }
 #endif
 
+#endif
 #endif
