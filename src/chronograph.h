@@ -15,7 +15,7 @@ namespace FSM {
       // Time since last reset (ms)
       fsm_timestamp_t now = 0;
       const fsm_timestamp_t phase = 0;
-      const fsm_timestamp_t delta;
+      fsm_timestamp_t delta;
 
       fsm_timestamp_t refholder;
     protected:
@@ -29,6 +29,11 @@ namespace FSM {
 
       fsm_timestamp_t get(void);
       void set(const fsm_timestamp_t& val);
+
+      fsm_timestamp_t getDelta() const { return delta; }
+      fsm_timestamp_t setDelta(const fsm_timestamp_t& val) { delta = val; return delta; }
+
+      fsm_key_t getKey() const { return ConditionalCallback<fsm_timestamp_t>::getKey(); }
   };
 
   class FlagInterval : public IntervalCallback {
@@ -48,11 +53,22 @@ namespace FSM {
     private:
       // Has the callback been triggered yet?
       bool triggered = false;
+
+      fsm_timestamp_t refholder;
     protected:
       void callOperator(const fsm_timestamp_t& val, const fsm_timestamp_t& ref) override;
+
+      const fsm_timestamp_t& childReference(const fsm_timestamp_t& val) override {
+        return refholder;
+      }
     public:
       ChronoEvent(const fsm_timestamp_t& timestamp, typename ConditionalCallback<fsm_timestamp_t>::cb_compval_t cb, bool invert = false);
       ChronoEvent(fsm_key_t key, const fsm_timestamp_t& timestamp, typename ConditionalCallback<fsm_timestamp_t>::cb_compval_t cb, bool invert = false);
+
+      fsm_timestamp_t getTimestamp() const { return refholder; }
+      void setTimestamp(const fsm_timestamp_t& val) { refholder = val; }
+
+      fsm_key_t getKey() const { return ConditionalCallback<fsm_timestamp_t>::getKey(); }
   };
 
   class FlagEvent : public FlagSetCondition<fsm_timestamp_t> {
