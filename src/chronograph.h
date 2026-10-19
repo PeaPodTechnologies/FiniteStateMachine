@@ -59,6 +59,9 @@ namespace FSM {
 
       fsm_timestamp_t refholder;
     protected:
+      ChronoEvent(const fsm_timestamp_t& timestamp, bool invert);
+      ChronoEvent(fsm_key_t key, const fsm_timestamp_t& timestamp, bool invert);
+
       void callOperator(const fsm_timestamp_t& val, const fsm_timestamp_t& ref) override;
 
       const fsm_timestamp_t& childReference(const fsm_timestamp_t& val) override {
@@ -74,8 +77,10 @@ namespace FSM {
       fsm_key_t getKey() const { return ConditionalCallback<fsm_timestamp_t>::getKey(); }
   };
 
-  class FlagEvent : public FlagSetCondition<fsm_timestamp_t> {
+  class FlagEvent : public ChronoEvent {
     private:
+      Flag* const flag;
+
       // Has the callback been triggered yet?
       bool triggered = false;
     protected:

@@ -87,9 +87,13 @@ void FlagInterval::childCallback(bool comp, const fsm_timestamp_t& val, const fs
   this->flag->set(comp);
 }
 
-ChronoEvent::ChronoEvent(const fsm_timestamp_t& timestamp, typename ConditionalCallback<fsm_timestamp_t>::cb_compval_t cb, bool invert) : ConditionalCallback<fsm_timestamp_t>(CMP_GEQ, timestamp, cb, invert) { }
+ChronoEvent::ChronoEvent(const fsm_timestamp_t& timestamp, bool invert) : refholder(timestamp), ConditionalCallback<fsm_timestamp_t>(CMP_GEQ, timestamp, invert) { }
 
-ChronoEvent::ChronoEvent(fsm_key_t key, const fsm_timestamp_t& timestamp, typename ConditionalCallback<fsm_timestamp_t>::cb_compval_t cb, bool invert) : ConditionalCallback<fsm_timestamp_t>(key, CMP_GEQ, timestamp, cb, invert) { }
+ChronoEvent::ChronoEvent(fsm_key_t key, const fsm_timestamp_t& timestamp, bool invert) : refholder(timestamp), ConditionalCallback<fsm_timestamp_t>(key, CMP_GEQ, timestamp, invert) { }
+
+ChronoEvent::ChronoEvent(const fsm_timestamp_t& timestamp, typename ConditionalCallback<fsm_timestamp_t>::cb_compval_t cb, bool invert) : refholder(timestamp), ConditionalCallback<fsm_timestamp_t>(CMP_GEQ, timestamp, cb, invert) { }
+
+ChronoEvent::ChronoEvent(fsm_key_t key, const fsm_timestamp_t& timestamp, typename ConditionalCallback<fsm_timestamp_t>::cb_compval_t cb, bool invert) : refholder(timestamp), ConditionalCallback<fsm_timestamp_t>(key, CMP_GEQ, timestamp, cb, invert) { }
 
 void ChronoEvent::callOperator(const fsm_timestamp_t& val, const fsm_timestamp_t& ref) {
   bool result = compare(this->comparator, val, ref);
@@ -116,8 +120,8 @@ void ChronoEvent::callOperator(const fsm_timestamp_t& val, const fsm_timestamp_t
   }
 }
 
-FlagEvent::FlagEvent(const fsm_timestamp_t& timestamp, Flag* flag, bool invert) : FlagSetCondition(CMP_GEQ, timestamp, flag, invert) { }
-FlagEvent::FlagEvent(fsm_key_t key, const fsm_timestamp_t& timestamp, Flag* flag, bool invert) : FlagSetCondition(key, CMP_GEQ, timestamp, flag, invert) { }
+FlagEvent::FlagEvent(const fsm_timestamp_t& timestamp, Flag* flag, bool invert) : flag(flag), ChronoEvent(timestamp, invert) { }
+FlagEvent::FlagEvent(fsm_key_t key, const fsm_timestamp_t& timestamp, Flag* flag, bool invert) : flag(flag), ChronoEvent(key, timestamp, invert) { }
 
 void FlagEvent::callOperator(const fsm_timestamp_t& val, const fsm_timestamp_t& ref) {
   bool result = compare(this->comparator, val, ref);
