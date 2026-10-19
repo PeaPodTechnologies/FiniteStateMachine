@@ -14,7 +14,7 @@ namespace FSM {
     private:
       // Time since last reset (ms)
       fsm_timestamp_t now = 0;
-      const fsm_timestamp_t phase = 0;
+      fsm_timestamp_t phase = 0;
       fsm_timestamp_t delta;
 
       fsm_timestamp_t refholder;
@@ -32,6 +32,9 @@ namespace FSM {
 
       fsm_timestamp_t getDelta() const { return delta; }
       fsm_timestamp_t setDelta(const fsm_timestamp_t& val) { delta = val; return delta; }
+
+      fsm_timestamp_t getPhase() const { return phase; }
+      fsm_timestamp_t setPhase(const fsm_timestamp_t& val) { phase = val; return phase; }
 
       fsm_key_t getKey() const { return ConditionalCallback<fsm_timestamp_t>::getKey(); }
   };
