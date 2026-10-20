@@ -35,6 +35,19 @@ namespace FSM {
 
   const fsm_key_t FSM_KEY_NULL = nullptr;
 
+  namespace detail {
+    class OwnedKey {
+      private:
+        String buffer;
+        bool present;
+
+      public:
+        explicit OwnedKey(fsm_key_t key) : buffer(key != FSM_KEY_NULL ? key : ""), present(key != FSM_KEY_NULL) { }
+
+        operator fsm_key_t() const { return present ? buffer.c_str() : FSM_KEY_NULL; }
+    };
+  }
+
   // template <typename A> struct conditional_callbacks_t {
   //   typedef ;
   //   typedef ;
@@ -115,8 +128,7 @@ namespace FSM {
       ConditionalCallback(fsm_key_t key, comparators_t cmp, const T& ref, cb_getref_t getReference = nullptr);
       ConditionalCallback(fsm_key_t key, comparators_t cmp, const T& ref, bool invert, cb_getref_t getReference = nullptr);
 
-      // static String nullKey = String();
-      fsm_key_t key;
+      detail::OwnedKey key;
 
       // FALLBACKS FOR FUNCPOINTERS
       virtual void childCallback(bool comp, const T& val, const T& ref); // NOP

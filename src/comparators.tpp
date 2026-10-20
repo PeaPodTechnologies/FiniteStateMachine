@@ -97,7 +97,7 @@ namespace FSM {
 
   // WITHOUT KEYS WITHOUT INVERT
 
-  template <typename T> ConditionalCallback<T>::ConditionalCallback(comparators_t cmp, const T& ref, const void* cb, callback_type_t cbtype, cb_getref_t getReference) : ConditionalCallback<T>(String(), cmp, ref, cb, cbtype, getReference) { }
+  template <typename T> ConditionalCallback<T>::ConditionalCallback(comparators_t cmp, const T& ref, const void* cb, callback_type_t cbtype, cb_getref_t getReference) : ConditionalCallback<T>(FSM_KEY_NULL, cmp, ref, cb, cbtype, getReference) { }
 
   template <typename T> ConditionalCallback<T>::ConditionalCallback(comparators_t cmp, const T& ref, cb_none_t cb, cb_getref_t getReference) : ConditionalCallback(cmp, ref, (const void*)cb, CB_NONE, getReference) { }
 

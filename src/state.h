@@ -29,8 +29,7 @@ namespace FSM {
 
       unsigned char numconditionals = 0;
     protected:
-      // static String nullKey = String();
-      fsm_key_t key;
+      detail::OwnedKey key;
       
       ConditionalCallback<T>* conditionals[MAX_CONDITIONALS] = { nullptr };
     public:
