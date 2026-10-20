@@ -196,9 +196,9 @@ fsm_timestamp_t Chronograph::get(void) { return State<fsm_timestamp_t>::get(); }
 ConditionalCallback<fsm_timestamp_t>* Chronograph::addEvent(const fsm_timestamp_t& timestamp, typename ConditionalCallback<fsm_timestamp_t>::cb_compval_t cb, bool invert) { return addConditional(new ChronoEvent(timestamp, cb, invert)); }
 ConditionalCallback<fsm_timestamp_t>* Chronograph::addEvent(fsm_key_t key, const fsm_timestamp_t& timestamp, typename ConditionalCallback<fsm_timestamp_t>::cb_compval_t cb, bool invert) { return addConditional(new ChronoEvent(key, timestamp, cb, invert)); }
 
-ConditionalCallback<fsm_timestamp_t>* Chronograph::addEventFlag(const fsm_timestamp_t& timestamp, Flag* flag, bool invert) { 
+ChronoEvent* Chronograph::addEventFlag(const fsm_timestamp_t& timestamp, Flag* flag, bool invert) { 
   return addEventFlag(flag->getKey(), timestamp, flag, invert); }  
-ConditionalCallback<fsm_timestamp_t>* Chronograph::addEventFlag(fsm_key_t key, const fsm_timestamp_t& timestamp, Flag* flag, bool invert) { 
+ChronoEvent* Chronograph::addEventFlag(fsm_key_t key, const fsm_timestamp_t& timestamp, Flag* flag, bool invert) { 
   #ifdef DEBUG_JSON
     #ifdef DEBUG_USE_BP
       BP_JSON();
@@ -221,7 +221,9 @@ ConditionalCallback<fsm_timestamp_t>* Chronograph::addEventFlag(fsm_key_t key, c
       DEBUG_JSON(m);
     #endif
   #endif
-  return addConditional(new FlagEvent(key, timestamp, flag, invert)); 
+  FlagEvent* event = new FlagEvent(key, timestamp, flag, invert);
+  addConditional(event);
+  return event;
 }  
 
 IntervalCallback* Chronograph::addInterval(const fsm_timestamp_t& delta, typename ConditionalCallback<fsm_timestamp_t>::cb_compval_t cb, bool invert) { 

@@ -117,8 +117,8 @@ namespace FSM {
       ConditionalCallback<fsm_timestamp_t>* addEvent(const fsm_timestamp_t& timestamp, typename ConditionalCallback<fsm_timestamp_t>::cb_compval_t cb, bool invert = false);
       ConditionalCallback<fsm_timestamp_t>* addEvent(fsm_key_t key, const fsm_timestamp_t& timestamp, typename ConditionalCallback<fsm_timestamp_t>::cb_compval_t cb, bool invert = false);
 
-      ConditionalCallback<fsm_timestamp_t>* addEventFlag(const fsm_timestamp_t& timestamp, Flag* flag, bool invert = false);
-      ConditionalCallback<fsm_timestamp_t>* addEventFlag(fsm_key_t key, const fsm_timestamp_t& timestamp, Flag* flag, bool invert = false);
+      ChronoEvent* addEventFlag(const fsm_timestamp_t& timestamp, Flag* flag, bool invert = false);
+      ChronoEvent* addEventFlag(fsm_key_t key, const fsm_timestamp_t& timestamp, Flag* flag, bool invert = false);
       
       IntervalCallback* addInterval(const fsm_timestamp_t& delta, typename ConditionalCallback<fsm_timestamp_t>::cb_compval_t cb, bool invert = false);
       IntervalCallback* addInterval(fsm_key_t key, const fsm_timestamp_t& delta, typename ConditionalCallback<fsm_timestamp_t>::cb_compval_t cb, bool invert = false);
