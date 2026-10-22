@@ -31,10 +31,13 @@ namespace FSM {
       void set(const fsm_timestamp_t& val);
 
       fsm_timestamp_t getDelta() const { return delta; }
-      fsm_timestamp_t setDelta(const fsm_timestamp_t& val) { delta = val; return delta; }
+      void setDelta(const fsm_timestamp_t& val) { delta = val; }
 
       fsm_timestamp_t getPhase() const { return phase; }
-      fsm_timestamp_t setPhase(const fsm_timestamp_t& val) { phase = val; return phase; }
+      void setPhase(const fsm_timestamp_t& val) { phase = val; }
+
+      bool getInvert() const { return invert; }
+      void setInvert(const bool& val) { invert = val; }
 
       fsm_key_t getKey() const { return ConditionalCallback<fsm_timestamp_t>::getKey(); }
   };
@@ -75,6 +78,9 @@ namespace FSM {
       void setTimestamp(const fsm_timestamp_t& val) { refholder = val; }
 
       fsm_key_t getKey() const { return ConditionalCallback<fsm_timestamp_t>::getKey(); }
+
+      bool getInvert() const { return invert; }
+      void setInvert(const bool& val) { invert = val; }
   };
 
   class FlagEvent : public ChronoEvent {

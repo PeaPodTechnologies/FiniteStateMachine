@@ -144,7 +144,7 @@ namespace FSM {
 
       T reference;
 
-      const bool invert = false;
+      bool invert = false;
 
       bool disabled = false;
 
