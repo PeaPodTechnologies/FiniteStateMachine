@@ -72,15 +72,15 @@ namespace FSM {
       Number operator*(const Number& rhs) const;
       Number operator/(const Number& rhs) const;
 
-      // Number++
-      inline Number& operator++() { value+=1; return *this; }
-      // ++Number
-      inline Number operator++(int) { Number temp = *this; value+=1; return temp; }
+      // Prefix increment
+      inline Number& operator++() { const double next = value + 1; set(next, isFloating, next < 0); return *this; }
+      // Postfix increment
+      inline Number operator++(int) { Number temp = *this; const double next = value + 1; set(next, isFloating, next < 0); return temp; }
 
-      // Number--
-      inline Number& operator--() { value-=1; return *this; }
-      // --Number
-      inline Number operator--(int) { Number temp = *this; value-=1; return temp; }
+      // Prefix decrement
+      inline Number& operator--() { const double next = value - 1; set(next, isFloating, next < 0); return *this; }
+      // Postfix decrement
+      inline Number operator--(int) { Number temp = *this; const double next = value - 1; set(next, isFloating, next < 0); return temp; }
 
       // Number{+-*/}= operators i.e. n += 2 are implicit in Number{+-*/} operators
 

@@ -47,6 +47,24 @@ void test_number_comparisons(void) {
   TEST_ASSERT_TRUE(numbers[3] < numbers[2]);
 }
 
+void test_number_increment_decrement_sign(void) {
+  Number value(0);
+
+  --value;
+  TEST_ASSERT_EQUAL_STRING("-1", value.toString().c_str());
+
+  ++value;
+  TEST_ASSERT_EQUAL_STRING("0", value.toString().c_str());
+
+  Number previous = value--;
+  TEST_ASSERT_EQUAL_STRING("0", previous.toString().c_str());
+  TEST_ASSERT_EQUAL_STRING("-1", value.toString().c_str());
+
+  previous = value++;
+  TEST_ASSERT_EQUAL_STRING("-1", previous.toString().c_str());
+  TEST_ASSERT_EQUAL_STRING("0", value.toString().c_str());
+}
+
 void setup() {
   delay(2000);
 
@@ -55,6 +73,7 @@ void setup() {
   UNITY_BEGIN();
   RUN_TEST(test_number_create);
   RUN_TEST(test_number_comparisons);
+  RUN_TEST(test_number_increment_decrement_sign);
   // RUN_TEST(test_number_operations);
 
   UNITY_END();
