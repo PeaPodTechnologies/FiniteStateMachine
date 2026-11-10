@@ -1,0 +1,37 @@
+@startuml
+title FiniteStateMachine library - callback evaluation flow
+
+skinparam linetype ortho
+
+start
+:State<T>.set(val);
+if (state disabled?) then (yes)
+  :store value only;
+else (no)
+  :for each ConditionalCallback;
+endif
+
+:ConditionalCallback.operator()(val);
+if (callback disabled?) then (yes)
+  :skip;
+else (no)
+  if (getReference provided?) then (yes)
+    :reference = getReference(val);
+  else (no)
+    :reference = childReference(val);
+  endif
+  :result = compare(comparator, val, reference);
+  if (result true?) then (yes)
+    if (callback pointer null?) then (yes)
+      :childCallback(invert-adjusted, val, ref);
+    else (no)
+      :dispatch by callback_type_t;
+    endif
+  else (no)
+    :no action;
+  endif
+endif
+
+stop
+
+@enduml

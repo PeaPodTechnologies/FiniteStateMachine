@@ -1,0 +1,106 @@
+@startuml
+title FSM - Conditionals: Hysteresis, Latching and Flag Bridges
+
+skinparam linetype ortho
+skinparam packageStyle rectangle
+hide empty members
+
+' Cross-diagram references (see uml-state.puml)
+package "FSM" {
+  class "ConditionalCallback<T>" as ConditionalCallbackT
+  class "State<T>" as StateT
+  class Flag
+}
+
+package "FSM" {
+  class "FlagSetCondition<T>" as FlagSetConditionT {
+    # flag : Flag*
+    # childCallback(comp, val, ref)
+  }
+
+  class BangBangConditional {
+    - state : bool
+    - triggered : bool
+    - low : Number
+    - high : Number
+    - rising : void*
+    - falling : void*
+    # childReference(val) : Number
+    # childCallback(comp, val, ref)
+    # callOperator(val, ref)
+  }
+
+  class LatchingConditional {
+    - state : bool
+    - triggered : bool
+    - rising : void*
+    - falling : void*
+    # childReference(val) : bool
+    # childCallback(comp, val, ref)
+    # callOperator(val, ref)
+  }
+
+  class BangBangFlagSet {
+    - state : bool
+    - triggered : bool
+    - low : Number
+    - high : Number
+    # childReference(val) : Number
+    # childCallback(comp, val, ref)
+    # callOperator(val, ref)
+  }
+
+  class LatchingFlagSet {
+    - state : bool
+    - triggered : bool
+    # childReference(val) : bool
+    # childCallback(comp, val, ref)
+    # callOperator(val, ref)
+  }
+}
+
+FlagSetConditionT --|> ConditionalCallbackT
+BangBangConditional --|> ConditionalCallbackT : ConditionalCallback<Number>
+LatchingConditional --|> ConditionalCallbackT : ConditionalCallback<bool>
+BangBangFlagSet --|> FlagSetConditionT : FlagSetCondition<Number>
+LatchingFlagSet --|> FlagSetConditionT : FlagSetCondition<bool>
+
+FlagSetConditionT --> Flag : sets
+
+StateT ..> FlagSetConditionT : creates
+StateT ..> BangBangConditional : creates\n(addLatchingConditional Number)
+StateT ..> LatchingConditional : creates\n(addLatchingConditional bool)
+StateT ..> BangBangFlagSet : creates\n(addLatchingSetFlag Number/time)
+StateT ..> LatchingFlagSet : creates\n(addLatchingSetFlag bool)
+
+note right of FlagSetConditionT
+Bridge condition: compare source state, then write result to Flag.
+Use to convert threshold logic into stable boolean control signals.
+Derived classes specialize hysteresis and latching behavior.
+end note
+
+note right of BangBangConditional
+Numeric hysteresis comparator with high/low thresholds.
+Triggers on edge crossings and suppresses chatter near boundaries.
+Typical use: thermostat or debounce-like threshold control.
+end note
+
+note right of LatchingConditional
+Boolean edge latch.
+Alternates internal expectation after each successful trigger,
+so callbacks fire on transitions rather than steady levels.
+end note
+
+note right of BangBangFlagSet
+Hysteresis-to-flag adapter.
+Implements bang-bang threshold tracking, then sets target Flag.
+Designed for robust actuator toggling from analog-style inputs.
+end note
+
+note right of LatchingFlagSet
+Boolean latch-to-flag adapter.
+Converts alternating true/false events into deterministic Flag writes.
+Useful when control flow needs explicit edge-driven toggles.
+end note
+
+@enduml

@@ -1,0 +1,119 @@
+@startuml
+title FSM - Chronograph and Time Primitives
+
+skinparam linetype ortho
+skinparam packageStyle rectangle
+hide empty members
+
+' Cross-diagram references (see uml-state.puml)
+package "FSM" {
+  class "ConditionalCallback<T>" as ConditionalCallbackT
+  class "State<T>" as StateT
+  class Flag
+}
+
+package "FSM" {
+  class IntervalCallback {
+    - now : fsm_timestamp_t
+    - phase : fsm_timestamp_t
+    - delta : fsm_timestamp_t
+    - refholder : fsm_timestamp_t
+    + get() : fsm_timestamp_t
+    + set(val : fsm_timestamp_t)
+    + getDelta() : fsm_timestamp_t
+    + setDelta(val)
+    + getPhase() : fsm_timestamp_t
+    + setPhase(val)
+    + getInvert() : bool
+    + setInvert(val)
+    # childReference(val) : fsm_timestamp_t
+  }
+
+  class FlagInterval {
+    - flag : Flag*
+    # childCallback(comp, val, ref)
+  }
+
+  class ChronoEvent {
+    - triggered : bool
+    - refholder : fsm_timestamp_t
+    + getTimestamp() : fsm_timestamp_t
+    + setTimestamp(val)
+    + getInvert() : bool
+    + setInvert(val)
+    # childReference(val) : fsm_timestamp_t
+    # callOperator(val, ref)
+  }
+
+  class FlagEvent {
+    - flag : Flag*
+    - triggered : bool
+    # childCallback(comp, val, ref)
+    # callOperator(val, ref)
+  }
+
+  class Chronograph {
+    - start : fsm_timestamp_t
+    - intervals : IntervalCallback*[16]
+    + set(val : fsm_timestamp_t)
+    + get() : fsm_timestamp_t
+    + addEvent(...)
+    + addEventFlag(...)
+    + addInterval(...)
+    + addIntervalFlag(...)
+    + addTwentyFourTimeout(...)
+    + removeInterval(interval)
+    + removeConditional(conditional)
+  }
+
+!if %not(%variable_exists("$CHRONOS_DEFINED"))
+!$CHRONOS_DEFINED = 1
+  object Chronos <<global instance>>
+!endif
+}
+
+Chronograph --|> StateT : State<fsm_timestamp_t>\n(protected)
+IntervalCallback --|> ConditionalCallbackT : ConditionalCallback<fsm_timestamp_t>\n(protected)
+FlagInterval --|> IntervalCallback
+ChronoEvent --|> ConditionalCallbackT : ConditionalCallback<fsm_timestamp_t>
+FlagEvent --|> ChronoEvent
+
+Chronograph *-- "0..16" IntervalCallback : owns
+FlagInterval --> Flag : toggles
+FlagEvent --> Flag : sets
+Chronos ..> Chronograph : instance of
+
+note right of Chronograph
+Chronograph wraps a timestamp State and updates interval
+objects using elapsed delta each tick.
+end note
+
+note right of IntervalCallback
+Periodic trigger primitive driven by Chronograph time progression.
+Supports optional phase offset and inversion.
+Use as the base mechanism for fixed-rate recurring actions.
+end note
+
+note right of FlagInterval
+IntervalCallback variant that writes directly to a Flag.
+Use for schedule windows such as periodic enable/disable outputs.
+end note
+
+note right of ChronoEvent
+One-shot time threshold trigger.
+Fires when current time reaches configured timestamp,
+with reset behavior handled by comparator state.
+end note
+
+note right of FlagEvent
+ChronoEvent variant that writes to a Flag.
+Use for timed turn-on or turn-off points in a daily cycle.
+end note
+
+note right of Chronos
+Library-level global Chronograph instance.
+Most sketches use this singleton as the central software clock.
+Drive it by calling Chronos.set(millis()) in the main loop.
+end note
+
+@enduml

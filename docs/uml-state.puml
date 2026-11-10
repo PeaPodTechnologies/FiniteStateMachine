@@ -1,0 +1,178 @@
+@startuml
+title FSM - State and Callback Core
+
+skinparam linetype ortho
+skinparam packageStyle rectangle
+hide empty members
+
+package "FSM" {
+  class Number {
+    - value : double
+    - isFloating : bool
+    - isSigned : bool
+    - notanumber : bool
+    + Number()
+    + Number(val)
+    + isNaN() : bool
+    + toString(floating=2) : String
+    + minimum(a, b) : Number
+    + maximum(a, b) : Number
+    + operator+(rhs) : Number
+    + operator-(rhs) : Number
+    + operator*(rhs) : Number
+    + operator/(rhs) : Number
+  }
+
+  class "detail::OwnedKey" as OwnedKey {
+    - buffer : String
+    - present : bool
+    + OwnedKey(key)
+    + operator fsm_key_t() const
+  }
+
+  enum comparators_t {
+    CMP_NOP
+    CMP_EQU
+    CMP_NEQ
+    CMP_LES
+    CMP_LEQ
+    CMP_GTR
+    CMP_GEQ
+  }
+
+  note left of comparators_t
+  Think of CMP_NOP as "no real comparison selected."
+  When that happens, the library falls back to a fixed answer:
+  - For boolean states, it acts like the condition passed.
+  - For numeric and timestamp states, it acts like the condition failed.
+  So CMP_NOP can trigger bool callbacks, but normally will not
+  trigger Number or time-based callbacks.
+  end note
+
+  enum callback_type_t {
+    CB_NONE
+    CB_COMP
+    CB_COMPVAL
+    CB_COMPVALREF
+  }
+
+  class "ConditionalCallback<T>" as ConditionalCallbackT {
+    # key : OwnedKey
+    # comparator : comparators_t
+    # reference : T
+    # invert : bool
+    # disabled : bool
+    # callback : void*
+    # callbacktype : callback_type_t
+    # getReference : cb_getref_t
+    + operator()(val : T)
+    + operator()(val : T, ref : T)
+    + compare(cmp, val, ref) : bool
+    + disable()
+    + enable()
+    + enable(val : T)
+    + getKey() : fsm_key_t
+    # childCallback(comp : bool, val : T, ref : T)
+    # childReference(val : T) : T
+    # callOperator(val : T, ref : T)
+    # executeCallback(val : T, ref : T)
+    # setComparator(cmp : comparators_t)
+  }
+
+  class "State<T>" as StateT {
+    - value : T
+    - defaultValue : T
+    - disabled : bool
+    - numconditionals : uint8
+    # key : OwnedKey
+    # conditionals : ConditionalCallback<T>*[10]
+    + State(value : T)
+    + State(value : T, key : fsm_key_t)
+    + get() : T
+    + set(val : T)
+    + addConditional(...)
+    + removeConditional(conditional)
+    + addConditionalSetFlag(...)
+    + addLatchingConditional(...)
+    + addLatchingSetFlag(...)
+    + addCallback(cb)
+    + enable()
+    + enable(val : T)
+    + resume()
+    + disable()
+    + disable(val : T)
+    + isDisabled() : bool
+    + toString() : String
+    + toString(val : T) : String
+  }
+
+  class Variable {
+    + Variable(value : Number)
+    + Variable(value : numeric)
+  }
+
+  class Flag {
+    + Flag(value=false)
+    + Flag(value, key)
+    + Flag(key)
+  }
+
+  object "Utility API" as UtilityAPI {
+    + parseComparator(cmp, result=true) : const char*
+    + stateToString<T>(val : T) : String
+    + timestampToString(val : fsm_timestamp_t) : String
+  }
+}
+
+Variable --|> StateT : State<Number>
+Flag --|> StateT : State<bool>
+
+StateT *-- "0..10" ConditionalCallbackT : owns
+ConditionalCallbackT *-- OwnedKey : key
+StateT *-- OwnedKey : key
+UtilityAPI ..> Number
+ConditionalCallbackT ..> comparators_t
+ConditionalCallbackT ..> callback_type_t
+
+note right of StateT
+State is the reactive container.
+set(val) stores value and evaluates each attached conditional
+unless disabled.
+end note
+
+note right of ConditionalCallbackT
+Callbacks support dynamic reference sources via getReference,
+comparator inversion, and four callback signatures.
+end note
+
+note right of Number
+Typed numeric wrapper used by Variable and bang-bang logic.
+Tracks integer vs floating and signedness metadata, plus NaN.
+Useful when embedded code must preserve intent across arithmetic.
+end note
+
+note right of OwnedKey
+Small ownership adapter for fsm_key_t.
+Converts optional const char* identifiers into safe String storage.
+Used by State and ConditionalCallback for debug labeling.
+end note
+
+note right of Variable
+Primary numeric state node.
+Use Variable for counters, sensor values, or computed quantities.
+Attach callbacks and latching/bang-bang conditionals directly.
+end note
+
+note right of Flag
+Boolean state node for on/off behavior.
+Often used as an actuator gate controlled by other states.
+Pairs with latching and interval/event helpers for scheduling.
+end note
+
+note right of UtilityAPI
+Shared conversion and comparator presentation helpers.
+Primarily intended for debug output and diagnostics.
+Keeps state/condition classes focused on behavior.
+end note
+
+@enduml
