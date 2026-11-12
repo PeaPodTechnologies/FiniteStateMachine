@@ -60,7 +60,7 @@ namespace FSM {
     }
   }
 
-  template <typename T> T State<T>::get(void) {
+  template <typename T> T State<T>::get(void) const {
     return this->value;
   }
 
@@ -148,6 +148,14 @@ namespace FSM {
 
   template <typename T> ConditionalCallback<T>* State<T>::addConditional(fsm_key_t key, comparators_t cmp, const T& ref, typename ConditionalCallback<T>::cb_compvalref_t cb, typename ConditionalCallback<T>::cb_getref_t getReference) { return addConditional(new ConditionalCallback<T>(key, cmp, ref, cb, getReference)); }
   template <typename T> ConditionalCallback<T>* State<T>::addConditional(comparators_t cmp, const T& ref, typename ConditionalCallback<T>::cb_compvalref_t cb, typename ConditionalCallback<T>::cb_getref_t getReference) { return addConditional(this->key, cmp, ref, cb, getReference); }
+  template <typename T> ConditionalCallback<T>* State<T>::addConditional(fsm_key_t key, comparators_t cmp, const T& ref, typename ConditionalCallback<T>::cb_compvalrefargs_t cb, const CallbackArgs* callbackArgs, typename ConditionalCallback<T>::cb_getref_t getReference) { return addConditional(new ConditionalCallback<T>(key, cmp, ref, cb, callbackArgs, getReference)); }
+  template <typename T> ConditionalCallback<T>* State<T>::addConditional(comparators_t cmp, const T& ref, typename ConditionalCallback<T>::cb_compvalrefargs_t cb, const CallbackArgs* callbackArgs, typename ConditionalCallback<T>::cb_getref_t getReference) { return addConditional(this->key, cmp, ref, cb, callbackArgs, getReference); }
+  template <typename T> ConditionalCallback<T>* State<T>::addConditional(fsm_key_t key, comparators_t cmp, const T& ref, typename ConditionalCallback<T>::cb_compvalrefargs_t cb, const CallbackArgs& callbackArgs, typename ConditionalCallback<T>::cb_getref_t getReference) { return addConditional(key, cmp, ref, cb, &callbackArgs, getReference); }
+  template <typename T> ConditionalCallback<T>* State<T>::addConditional(comparators_t cmp, const T& ref, typename ConditionalCallback<T>::cb_compvalrefargs_t cb, const CallbackArgs& callbackArgs, typename ConditionalCallback<T>::cb_getref_t getReference) { return addConditional(this->key, cmp, ref, cb, callbackArgs, getReference); }
+  template <typename T> ConditionalCallback<T>* State<T>::addConditionalWithFlag(fsm_key_t key, comparators_t cmp, const T& ref, typename ConditionalCallback<T>::cb_compvalrefargs_t cb, const Flag& callbackFlag, typename ConditionalCallback<T>::cb_getref_t getReference) { return addConditional(new ConditionalCallback<T>(key, cmp, ref, cb, new CallbacksArgsFlag(callbackFlag), getReference, true)); }
+  template <typename T> ConditionalCallback<T>* State<T>::addConditionalWithFlag(comparators_t cmp, const T& ref, typename ConditionalCallback<T>::cb_compvalrefargs_t cb, const Flag& callbackFlag, typename ConditionalCallback<T>::cb_getref_t getReference) { return addConditionalWithFlag(this->key, cmp, ref, cb, callbackFlag, getReference); }
+  template <typename T> ConditionalCallback<T>* State<T>::addConditionalWithVariable(fsm_key_t key, comparators_t cmp, const T& ref, typename ConditionalCallback<T>::cb_compvalrefargs_t cb, const Variable& callbackVariable, typename ConditionalCallback<T>::cb_getref_t getReference) { return addConditional(new ConditionalCallback<T>(key, cmp, ref, cb, new CallbackArgsVariable(callbackVariable), getReference, true)); }
+  template <typename T> ConditionalCallback<T>* State<T>::addConditionalWithVariable(comparators_t cmp, const T& ref, typename ConditionalCallback<T>::cb_compvalrefargs_t cb, const Variable& callbackVariable, typename ConditionalCallback<T>::cb_getref_t getReference) { return addConditionalWithVariable(this->key, cmp, ref, cb, callbackVariable, getReference); }
 
   template <typename T> ConditionalCallback<T>* State<T>::addConditionalSetFlag(comparators_t cmp, const T& ref, Flag* flag, typename ConditionalCallback<T>::cb_getref_t getReference) { return addConditionalSetFlag(this->key, cmp, ref, flag, getReference); }
   template <typename T> ConditionalCallback<T>* State<T>::addConditionalSetFlag(fsm_key_t key, comparators_t cmp, const T& ref, Flag* flag, typename ConditionalCallback<T>::cb_getref_t getReference) { return addConditional(new FlagSetCondition<T>(cmp, ref, flag, getReference)); }

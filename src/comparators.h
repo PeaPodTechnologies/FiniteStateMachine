@@ -7,6 +7,7 @@
 #define NOP_COMP_NUMBER false
 
 namespace FSM {
+  class CallbackArgs;
 
   typedef enum {
     CMP_NOP = 0,
@@ -28,6 +29,7 @@ namespace FSM {
     CB_COMP,       // void (* const)(bool) - ADD: CONDITION RESULT
     CB_COMPVAL,    // void (* const)(bool, T) - ADD: PASSED VALUE
     CB_COMPVALREF, // void (* const)(bool, T, T) - ADD: REFERENCE VALUE
+    CB_COMPVALREFARGS, // void (* const)(bool, T, T, const CallbackArgs*) - ADD: CALLBACK ARGS POINTER
   } callback_type_t;
 
   // typedef const String fsm_key_t;
@@ -73,6 +75,7 @@ namespace FSM {
       typedef void (* const cb_comp_t)(bool);
       typedef void (* const cb_compval_t)(bool, const T&);
       typedef void (* const cb_compvalref_t)(bool, const T&, const T&);
+      typedef void (* const cb_compvalrefargs_t)(bool, const T&, const T&, const CallbackArgs*);
 
       ~ConditionalCallback();
       
@@ -84,29 +87,37 @@ namespace FSM {
        * REFERENCE UPDATOR (OPTIONAL)
        **/
       // const char* key, comparators_t cmp, const T& ref, bool invert, cb_getref_t getReference
-      ConditionalCallback(fsm_key_t key, comparators_t cmp, const T& ref, const void* cb, callback_type_t cbtype, cb_getref_t getReference = nullptr);
+      ConditionalCallback(fsm_key_t key, comparators_t cmp, const T& ref, const void* cb, callback_type_t cbtype, cb_getref_t getReference = nullptr, const CallbackArgs* callbackArgs = nullptr, bool ownsCallbackArgs = false);
       ConditionalCallback(fsm_key_t key, comparators_t cmp, const T& ref, cb_none_t cb, const T&(* const getReference)(const T&) = nullptr);
       ConditionalCallback(fsm_key_t key, comparators_t cmp, const T& ref, cb_comp_t cb, cb_getref_t getReference = nullptr);
       ConditionalCallback(fsm_key_t key, comparators_t cmp, const T& ref, cb_compval_t cb, cb_getref_t getReference = nullptr);
       ConditionalCallback(fsm_key_t key, comparators_t cmp, const T& ref, cb_compvalref_t cb, cb_getref_t getReference = nullptr);
+      ConditionalCallback(fsm_key_t key, comparators_t cmp, const T& ref, cb_compvalrefargs_t cb, const CallbackArgs* callbackArgs, cb_getref_t getReference = nullptr, bool ownsCallbackArgs = false);
+      ConditionalCallback(fsm_key_t key, comparators_t cmp, const T& ref, cb_compvalrefargs_t cb, const CallbackArgs& callbackArgs, cb_getref_t getReference = nullptr);
 
-      ConditionalCallback(fsm_key_t key, comparators_t cmp, const T& ref, const void* cb, callback_type_t cbtype, bool invert, cb_getref_t getReference = nullptr);
+      ConditionalCallback(fsm_key_t key, comparators_t cmp, const T& ref, const void* cb, callback_type_t cbtype, bool invert, cb_getref_t getReference = nullptr, const CallbackArgs* callbackArgs = nullptr, bool ownsCallbackArgs = false);
       ConditionalCallback(fsm_key_t key, comparators_t cmp, const T& ref, cb_none_t cb, bool invert, cb_getref_t getReference = nullptr);
       ConditionalCallback(fsm_key_t key, comparators_t cmp, const T& ref, cb_comp_t cb, bool invert, cb_getref_t getReference = nullptr);
       ConditionalCallback(fsm_key_t key, comparators_t cmp, const T& ref, cb_compval_t cb, bool invert, cb_getref_t getReference = nullptr);
       ConditionalCallback(fsm_key_t key, comparators_t cmp, const T& ref, cb_compvalref_t  cb, bool invert, cb_getref_t getReference = nullptr);
+      ConditionalCallback(fsm_key_t key, comparators_t cmp, const T& ref, cb_compvalrefargs_t cb, bool invert, const CallbackArgs* callbackArgs, cb_getref_t getReference = nullptr, bool ownsCallbackArgs = false);
+      ConditionalCallback(fsm_key_t key, comparators_t cmp, const T& ref, cb_compvalrefargs_t cb, bool invert, const CallbackArgs& callbackArgs, cb_getref_t getReference = nullptr);
 
-      ConditionalCallback(comparators_t cmp, const T& ref, const void* cb, callback_type_t cbtype, cb_getref_t getReference = nullptr);
+      ConditionalCallback(comparators_t cmp, const T& ref, const void* cb, callback_type_t cbtype, cb_getref_t getReference = nullptr, const CallbackArgs* callbackArgs = nullptr, bool ownsCallbackArgs = false);
       ConditionalCallback(comparators_t cmp, const T& ref, cb_none_t cb, const T&(* const getReference)(const T&) = nullptr);
       ConditionalCallback(comparators_t cmp, const T& ref, cb_comp_t cb, cb_getref_t getReference = nullptr);
       ConditionalCallback(comparators_t cmp, const T& ref, cb_compval_t cb, cb_getref_t getReference = nullptr);
       ConditionalCallback(comparators_t cmp, const T& ref, cb_compvalref_t cb, cb_getref_t getReference = nullptr);
+      ConditionalCallback(comparators_t cmp, const T& ref, cb_compvalrefargs_t cb, const CallbackArgs* callbackArgs, cb_getref_t getReference = nullptr, bool ownsCallbackArgs = false);
+      ConditionalCallback(comparators_t cmp, const T& ref, cb_compvalrefargs_t cb, const CallbackArgs& callbackArgs, cb_getref_t getReference = nullptr);
 
-      ConditionalCallback(comparators_t cmp, const T& ref, const void* cb, callback_type_t cbtype, bool invert, cb_getref_t getReference = nullptr);
+      ConditionalCallback(comparators_t cmp, const T& ref, const void* cb, callback_type_t cbtype, bool invert, cb_getref_t getReference = nullptr, const CallbackArgs* callbackArgs = nullptr, bool ownsCallbackArgs = false);
       ConditionalCallback(comparators_t cmp, const T& ref, cb_none_t cb, bool invert, cb_getref_t getReference = nullptr);
       ConditionalCallback(comparators_t cmp, const T& ref, cb_comp_t cb, bool invert, cb_getref_t getReference = nullptr);
       ConditionalCallback(comparators_t cmp, const T& ref, cb_compval_t cb, bool invert, cb_getref_t getReference = nullptr);
       ConditionalCallback(comparators_t cmp, const T& ref, cb_compvalref_t  cb, bool invert, cb_getref_t getReference = nullptr);
+      ConditionalCallback(comparators_t cmp, const T& ref, cb_compvalrefargs_t cb, bool invert, const CallbackArgs* callbackArgs, cb_getref_t getReference = nullptr, bool ownsCallbackArgs = false);
+      ConditionalCallback(comparators_t cmp, const T& ref, cb_compvalrefargs_t cb, bool invert, const CallbackArgs& callbackArgs, cb_getref_t getReference = nullptr);
 
       ConditionalCallback<T>& operator=(ConditionalCallback<T> const& other);
 
@@ -149,6 +160,8 @@ namespace FSM {
       bool disabled = false;
 
       const void* callback;
+      const CallbackArgs* callbackArgs = nullptr;
+      const bool ownsCallbackArgs = false;
 
       const callback_type_t callbacktype;
 

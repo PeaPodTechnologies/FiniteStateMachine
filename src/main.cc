@@ -164,8 +164,6 @@ void logCycle(bool _, const Number& cycle) {
 
   #ifdef DEBUG_JSON
   DEBUG_JSON(m);
-  #else
-  Serial.println(m);
   #endif
 }
 
@@ -189,7 +187,9 @@ void controlLights(bool _, const bool& lights) {
   String m = _F("==== [ Lights: ");
   m += lights ? _F("ON") : _F("OFF");
   m += _F(" ] ====");
+  #ifdef DEBUG_JSON
   DebugJson::telemetry(millis(), m, Serial);
+  #endif
   // Serial.println(m);
 }
 #endif
@@ -204,7 +204,9 @@ void controlWatering(bool _, const bool& watering) {
   String m = _F("==== [ Watering: ");
   m += watering ? _F("ON") : _F("OFF");
   m += _F(" ] ====");
+  #ifdef DEBUG_JSON
   DebugJson::telemetry(millis(), m, Serial);
+  #endif
   // Serial.println(m);
 }
 #endif
@@ -214,7 +216,9 @@ void controlDisco(bool _, const bool& disco) {
   String m = _F("==== [ Disco: ");
   m += disco ? _F("ON") : _F("OFF");
   m += _F(" ] ====");
+  #ifdef DEBUG_JSON
   DebugJson::telemetry(millis(), m, Serial);
+  #endif
   // if(disco) {
   //   // Disable - don't worry about setting, disco scroll will take it from here
   //   lighting->disable();
@@ -232,7 +236,9 @@ void scrollDisco(bool _, const fsm_timestamp_t& __) {
   String m = _F("==== [ Blink PWM: ");
   m += discoPWM;
   m += _F(" ] ====");
+  #ifdef DEBUG_JSON
   DebugJson::telemetry(millis(), m, Serial);
+  #endif
 
   if(disco->get()) { // && lighting->isDisabled()) {
     // analogWrite(PIN_LIGHTING_HI, discoPWM);

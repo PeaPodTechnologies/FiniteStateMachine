@@ -21,11 +21,11 @@ namespace FSM {
     protected:
       const fsm_timestamp_t& childReference(const fsm_timestamp_t& val) override;
     public:
-      IntervalCallback(const fsm_timestamp_t& delta, const void* cb, callback_type_t cbtype, bool invert = false);
-      IntervalCallback(const fsm_timestamp_t& delta, const fsm_timestamp_t& phase, const void* cb, callback_type_t cbtype, bool invert = false);
+      IntervalCallback(const fsm_timestamp_t& delta, const void* cb, callback_type_t cbtype, bool invert = false, const CallbackArgs* callbackArgs = nullptr, bool ownsCallbackArgs = false);
+      IntervalCallback(const fsm_timestamp_t& delta, const fsm_timestamp_t& phase, const void* cb, callback_type_t cbtype, bool invert = false, const CallbackArgs* callbackArgs = nullptr, bool ownsCallbackArgs = false);
       
-      IntervalCallback(fsm_key_t key, const fsm_timestamp_t& delta, const void* cb, callback_type_t cbtype, bool invert = false);
-      IntervalCallback(fsm_key_t key, const fsm_timestamp_t& delta, const fsm_timestamp_t& phase, const void* cb, callback_type_t cbtype, bool invert = false);
+      IntervalCallback(fsm_key_t key, const fsm_timestamp_t& delta, const void* cb, callback_type_t cbtype, bool invert = false, const CallbackArgs* callbackArgs = nullptr, bool ownsCallbackArgs = false);
+      IntervalCallback(fsm_key_t key, const fsm_timestamp_t& delta, const fsm_timestamp_t& phase, const void* cb, callback_type_t cbtype, bool invert = false, const CallbackArgs* callbackArgs = nullptr, bool ownsCallbackArgs = false);
 
       fsm_timestamp_t get(void);
       void set(const fsm_timestamp_t& val);
@@ -73,6 +73,8 @@ namespace FSM {
     public:
       ChronoEvent(const fsm_timestamp_t& timestamp, typename ConditionalCallback<fsm_timestamp_t>::cb_compval_t cb, bool invert = false);
       ChronoEvent(fsm_key_t key, const fsm_timestamp_t& timestamp, typename ConditionalCallback<fsm_timestamp_t>::cb_compval_t cb, bool invert = false);
+      ChronoEvent(const fsm_timestamp_t& timestamp, typename ConditionalCallback<fsm_timestamp_t>::cb_compvalrefargs_t cb, const CallbackArgs* callbackArgs, bool invert = false, bool ownsCallbackArgs = false);
+      ChronoEvent(fsm_key_t key, const fsm_timestamp_t& timestamp, typename ConditionalCallback<fsm_timestamp_t>::cb_compvalrefargs_t cb, const CallbackArgs* callbackArgs, bool invert = false, bool ownsCallbackArgs = false);
 
       fsm_timestamp_t getTimestamp() const { return refholder; }
       void setTimestamp(const fsm_timestamp_t& val) { refholder = val; }
@@ -122,19 +124,41 @@ namespace FSM {
 
       ConditionalCallback<fsm_timestamp_t>* addEvent(const fsm_timestamp_t& timestamp, typename ConditionalCallback<fsm_timestamp_t>::cb_compval_t cb, bool invert = false);
       ConditionalCallback<fsm_timestamp_t>* addEvent(fsm_key_t key, const fsm_timestamp_t& timestamp, typename ConditionalCallback<fsm_timestamp_t>::cb_compval_t cb, bool invert = false);
+      ConditionalCallback<fsm_timestamp_t>* addEvent(const fsm_timestamp_t& timestamp, typename ConditionalCallback<fsm_timestamp_t>::cb_compvalrefargs_t cb, const CallbackArgs* callbackArgs, bool invert = false);
+      ConditionalCallback<fsm_timestamp_t>* addEvent(fsm_key_t key, const fsm_timestamp_t& timestamp, typename ConditionalCallback<fsm_timestamp_t>::cb_compvalrefargs_t cb, const CallbackArgs* callbackArgs, bool invert = false);
+      ConditionalCallback<fsm_timestamp_t>* addEvent(const fsm_timestamp_t& timestamp, typename ConditionalCallback<fsm_timestamp_t>::cb_compvalrefargs_t cb, const CallbackArgs& callbackArgs, bool invert = false);
+      ConditionalCallback<fsm_timestamp_t>* addEvent(fsm_key_t key, const fsm_timestamp_t& timestamp, typename ConditionalCallback<fsm_timestamp_t>::cb_compvalrefargs_t cb, const CallbackArgs& callbackArgs, bool invert = false);
 
       ChronoEvent* addEventFlag(const fsm_timestamp_t& timestamp, Flag* flag, bool invert = false);
       ChronoEvent* addEventFlag(fsm_key_t key, const fsm_timestamp_t& timestamp, Flag* flag, bool invert = false);
+      ConditionalCallback<fsm_timestamp_t>* addEventFlag(const fsm_timestamp_t& timestamp, typename ConditionalCallback<fsm_timestamp_t>::cb_compvalrefargs_t cb, const Flag& callbackFlag, bool invert = false);
+      ConditionalCallback<fsm_timestamp_t>* addEventFlag(fsm_key_t key, const fsm_timestamp_t& timestamp, typename ConditionalCallback<fsm_timestamp_t>::cb_compvalrefargs_t cb, const Flag& callbackFlag, bool invert = false);
       
       IntervalCallback* addInterval(const fsm_timestamp_t& delta, typename ConditionalCallback<fsm_timestamp_t>::cb_compval_t cb, bool invert = false);
       IntervalCallback* addInterval(fsm_key_t key, const fsm_timestamp_t& delta, typename ConditionalCallback<fsm_timestamp_t>::cb_compval_t cb, bool invert = false);
       IntervalCallback* addInterval(const fsm_timestamp_t& delta, const fsm_timestamp_t& phase, typename ConditionalCallback<fsm_timestamp_t>::cb_compval_t cb, bool invert = false);
-      IntervalCallback* addInterval(fsm_key_t key, const fsm_timestamp_t& delta, const fsm_timestamp_t& phase, typename ConditionalCallback<fsm_timestamp_t>::cb_compval_t cb, bool invert = false);
+      IntervalCallback* addInterval(fsm_key_t key, const fsm_timestamp_t& delta, const fsm_timestamp_t&phase, typename ConditionalCallback<fsm_timestamp_t>::cb_compval_t cb, bool invert = false);
+      IntervalCallback* addInterval(const fsm_timestamp_t& delta, typename ConditionalCallback<fsm_timestamp_t>::cb_compvalrefargs_t cb, const CallbackArgs* callbackArgs, bool invert = false);
+      IntervalCallback* addInterval(fsm_key_t key, const fsm_timestamp_t& delta, typename ConditionalCallback<fsm_timestamp_t>::cb_compvalrefargs_t cb, const CallbackArgs* callbackArgs, bool invert = false);
+      IntervalCallback* addInterval(const fsm_timestamp_t& delta, const fsm_timestamp_t& phase, typename ConditionalCallback<fsm_timestamp_t>::cb_compvalrefargs_t cb, const CallbackArgs* callbackArgs, bool invert = false);
+      IntervalCallback* addInterval(fsm_key_t key, const fsm_timestamp_t& delta, const fsm_timestamp_t&phase, typename ConditionalCallback<fsm_timestamp_t>::cb_compvalrefargs_t cb, const CallbackArgs* callbackArgs, bool invert = false);
+      IntervalCallback* addInterval(const fsm_timestamp_t& delta, typename ConditionalCallback<fsm_timestamp_t>::cb_compvalrefargs_t cb, const CallbackArgs* callbackArgs, bool invert, bool ownsCallbackArgs);
+      IntervalCallback* addInterval(fsm_key_t key, const fsm_timestamp_t& delta, typename ConditionalCallback<fsm_timestamp_t>::cb_compvalrefargs_t cb, const CallbackArgs* callbackArgs, bool invert, bool ownsCallbackArgs);
+      IntervalCallback* addInterval(const fsm_timestamp_t& delta, const fsm_timestamp_t& phase, typename ConditionalCallback<fsm_timestamp_t>::cb_compvalrefargs_t cb, const CallbackArgs* callbackArgs, bool invert, bool ownsCallbackArgs);
+      IntervalCallback* addInterval(fsm_key_t key, const fsm_timestamp_t& delta, const fsm_timestamp_t&phase, typename ConditionalCallback<fsm_timestamp_t>::cb_compvalrefargs_t cb, const CallbackArgs* callbackArgs, bool invert, bool ownsCallbackArgs);
+      IntervalCallback* addInterval(const fsm_timestamp_t& delta, typename ConditionalCallback<fsm_timestamp_t>::cb_compvalrefargs_t cb, const CallbackArgs& callbackArgs, bool invert = false);
+      IntervalCallback* addInterval(fsm_key_t key, const fsm_timestamp_t& delta, typename ConditionalCallback<fsm_timestamp_t>::cb_compvalrefargs_t cb, const CallbackArgs& callbackArgs, bool invert = false);
+      IntervalCallback* addInterval(const fsm_timestamp_t& delta, const fsm_timestamp_t& phase, typename ConditionalCallback<fsm_timestamp_t>::cb_compvalrefargs_t cb, const CallbackArgs& callbackArgs, bool invert = false);
+      IntervalCallback* addInterval(fsm_key_t key, const fsm_timestamp_t& delta, const fsm_timestamp_t&phase, typename ConditionalCallback<fsm_timestamp_t>::cb_compvalrefargs_t cb, const CallbackArgs& callbackArgs, bool invert = false);
 
       IntervalCallback* addIntervalFlag(const fsm_timestamp_t& delta, Flag* flag, bool invert = false);
       IntervalCallback* addIntervalFlag(fsm_key_t key, const fsm_timestamp_t& delta, Flag* flag, bool invert = false);
       IntervalCallback* addIntervalFlag(const fsm_timestamp_t& delta, const fsm_timestamp_t& phase, Flag* flag, bool invert = false);
       IntervalCallback* addIntervalFlag(fsm_key_t key, const fsm_timestamp_t& delta, const fsm_timestamp_t& phase, Flag* flag, bool invert = false);
+      IntervalCallback* addIntervalFlag(const fsm_timestamp_t& delta, typename ConditionalCallback<fsm_timestamp_t>::cb_compvalrefargs_t cb, const Flag& callbackFlag, bool invert = false);
+      IntervalCallback* addIntervalFlag(fsm_key_t key, const fsm_timestamp_t& delta, typename ConditionalCallback<fsm_timestamp_t>::cb_compvalrefargs_t cb, const Flag& callbackFlag, bool invert = false);
+      IntervalCallback* addIntervalFlag(const fsm_timestamp_t& delta, const fsm_timestamp_t& phase, typename ConditionalCallback<fsm_timestamp_t>::cb_compvalrefargs_t cb, const Flag& callbackFlag, bool invert = false);
+      IntervalCallback* addIntervalFlag(fsm_key_t key, const fsm_timestamp_t& delta, const fsm_timestamp_t& phase, typename ConditionalCallback<fsm_timestamp_t>::cb_compvalrefargs_t cb, const Flag& callbackFlag, bool invert = false);
       
       IntervalCallback* addTwentyFourTimeout(const fsm_timestamp_t& delay, typename ConditionalCallback<fsm_timestamp_t>::cb_compval_t cb, bool invert = false);
       IntervalCallback* addTwentyFourTimeout(fsm_key_t key, const fsm_timestamp_t& delay, typename ConditionalCallback<fsm_timestamp_t>::cb_compval_t cb, bool invert = false);

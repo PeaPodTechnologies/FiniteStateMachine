@@ -1,13 +1,14 @@
 #include <comparators.h>
+#include <state.h>
 
 #include <debug_fsm.h>
 #include <number.h>
 
 using namespace FSM;
 
-template <> ConditionalCallback<bool>::~ConditionalCallback() { }
-template <> ConditionalCallback<Number>::~ConditionalCallback() { }
-template <> ConditionalCallback<fsm_timestamp_t>::~ConditionalCallback() { }
+template <> ConditionalCallback<bool>::~ConditionalCallback() { if(this->ownsCallbackArgs && this->callbackArgs != nullptr) delete this->callbackArgs; }
+template <> ConditionalCallback<Number>::~ConditionalCallback() { if(this->ownsCallbackArgs && this->callbackArgs != nullptr) delete this->callbackArgs; }
+template <> ConditionalCallback<fsm_timestamp_t>::~ConditionalCallback() { if(this->ownsCallbackArgs && this->callbackArgs != nullptr) delete this->callbackArgs; }
 
 template <> String FSM::stateToString<bool>(const bool& val) { return val ? _F("true") : _F("false"); }
 template <> String FSM::stateToString<Number>(const Number& val) { return val.toString(); }
@@ -274,6 +275,9 @@ void BangBangConditional::childCallback(bool comp, const Number& val, const Numb
       case CB_COMPVALREF:
         ((cb_compvalref_t)fn)(_, val, ref);
         break;
+      case CB_COMPVALREFARGS:
+        ((cb_compvalrefargs_t)fn)(_, val, ref, this->callbackArgs);
+        break;
     }
   }
 }
@@ -398,6 +402,9 @@ void LatchingConditional::childCallback(bool comp, const bool& val, const bool& 
         break;
       case CB_COMPVALREF:
         ((cb_compvalref_t)fn)(comp, val, ref);
+        break;
+      case CB_COMPVALREFARGS:
+        ((cb_compvalrefargs_t)fn)(comp, val, ref, this->callbackArgs);
         break;
     }
   }
