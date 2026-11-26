@@ -42,6 +42,8 @@ namespace FSM {
       ~Number();
 
       bool isNaN(void) const;
+      bool getIsFloating(void) const { return isFloating; }
+      bool getIsSigned(void) const { return isSigned; }
 
       double operator()(void) const;
 

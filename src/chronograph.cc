@@ -10,13 +10,13 @@ FSM::Chronograph FSM::Chronos = FSM::Chronograph();
 
 using namespace FSM;
 
-IntervalCallback::IntervalCallback(const fsm_timestamp_t& delta, const void* cb, callback_type_t cbtype, bool invert) : now(delta), delta(delta), ConditionalCallback<fsm_timestamp_t>(CMP_GTR, delta, cb, cbtype, invert) { }
+IntervalCallback::IntervalCallback(const fsm_timestamp_t& delta, const void* cb, callback_type_t cbtype, bool invert, const CallbackArgs* callbackArgs, bool ownsCallbackArgs) : now(delta), delta(delta), ConditionalCallback<fsm_timestamp_t>(CMP_GTR, delta, cb, cbtype, invert, nullptr, callbackArgs, ownsCallbackArgs) { }
 
-IntervalCallback::IntervalCallback(const fsm_timestamp_t& delta, const fsm_timestamp_t& phase, const void* cb, callback_type_t cbtype, bool invert) : now(delta), delta(delta), phase(phase % delta), ConditionalCallback<fsm_timestamp_t>(CMP_GTR, delta, cb, cbtype, invert) { }
+IntervalCallback::IntervalCallback(const fsm_timestamp_t& delta, const fsm_timestamp_t& phase, const void* cb, callback_type_t cbtype, bool invert, const CallbackArgs* callbackArgs, bool ownsCallbackArgs) : now(delta), delta(delta), phase(phase % delta), ConditionalCallback<fsm_timestamp_t>(CMP_GTR, delta, cb, cbtype, invert, nullptr, callbackArgs, ownsCallbackArgs) { }
 
-IntervalCallback::IntervalCallback(fsm_key_t key, const fsm_timestamp_t& delta, const void* cb, callback_type_t cbtype, bool invert) : now(delta), delta(delta), ConditionalCallback<fsm_timestamp_t>(key, CMP_GTR, delta, cb, cbtype, invert) { }
+IntervalCallback::IntervalCallback(fsm_key_t key, const fsm_timestamp_t& delta, const void* cb, callback_type_t cbtype, bool invert, const CallbackArgs* callbackArgs, bool ownsCallbackArgs) : now(delta), delta(delta), ConditionalCallback<fsm_timestamp_t>(key, CMP_GTR, delta, cb, cbtype, invert, nullptr, callbackArgs, ownsCallbackArgs) { }
 
-IntervalCallback::IntervalCallback(fsm_key_t key, const fsm_timestamp_t& delta, const fsm_timestamp_t& phase, const void* cb, callback_type_t cbtype, bool invert) : now(delta), delta(delta), phase(phase % delta), ConditionalCallback<fsm_timestamp_t>(key, CMP_GTR, delta, cb, cbtype, invert) { }
+IntervalCallback::IntervalCallback(fsm_key_t key, const fsm_timestamp_t& delta, const fsm_timestamp_t& phase, const void* cb, callback_type_t cbtype, bool invert, const CallbackArgs* callbackArgs, bool ownsCallbackArgs) : now(delta), delta(delta), phase(phase % delta), ConditionalCallback<fsm_timestamp_t>(key, CMP_GTR, delta, cb, cbtype, invert, nullptr, callbackArgs, ownsCallbackArgs) { }
 
 const fsm_timestamp_t& IntervalCallback::childReference(const fsm_timestamp_t& val) {
   // If the new value is way over the line, modulus and set now
@@ -94,6 +94,10 @@ ChronoEvent::ChronoEvent(fsm_key_t key, const fsm_timestamp_t& timestamp, bool i
 ChronoEvent::ChronoEvent(const fsm_timestamp_t& timestamp, typename ConditionalCallback<fsm_timestamp_t>::cb_compval_t cb, bool invert) : refholder(timestamp), ConditionalCallback<fsm_timestamp_t>(CMP_GEQ, timestamp, cb, invert) { }
 
 ChronoEvent::ChronoEvent(fsm_key_t key, const fsm_timestamp_t& timestamp, typename ConditionalCallback<fsm_timestamp_t>::cb_compval_t cb, bool invert) : refholder(timestamp), ConditionalCallback<fsm_timestamp_t>(key, CMP_GEQ, timestamp, cb, invert) { }
+
+ChronoEvent::ChronoEvent(const fsm_timestamp_t& timestamp, typename ConditionalCallback<fsm_timestamp_t>::cb_compvalrefargs_t cb, const CallbackArgs* callbackArgs, bool invert, bool ownsCallbackArgs) : refholder(timestamp), ConditionalCallback<fsm_timestamp_t>(CMP_GEQ, timestamp, cb, invert, callbackArgs, nullptr, ownsCallbackArgs) { }
+
+ChronoEvent::ChronoEvent(fsm_key_t key, const fsm_timestamp_t& timestamp, typename ConditionalCallback<fsm_timestamp_t>::cb_compvalrefargs_t cb, const CallbackArgs* callbackArgs, bool invert, bool ownsCallbackArgs) : refholder(timestamp), ConditionalCallback<fsm_timestamp_t>(key, CMP_GEQ, timestamp, cb, invert, callbackArgs, nullptr, ownsCallbackArgs) { }
 
 void ChronoEvent::callOperator(const fsm_timestamp_t& val, const fsm_timestamp_t& ref) {
   bool result = compare(this->comparator, val, ref);
@@ -195,6 +199,10 @@ fsm_timestamp_t Chronograph::get(void) { return State<fsm_timestamp_t>::get(); }
 
 ConditionalCallback<fsm_timestamp_t>* Chronograph::addEvent(const fsm_timestamp_t& timestamp, typename ConditionalCallback<fsm_timestamp_t>::cb_compval_t cb, bool invert) { return addConditional(new ChronoEvent(timestamp, cb, invert)); }
 ConditionalCallback<fsm_timestamp_t>* Chronograph::addEvent(fsm_key_t key, const fsm_timestamp_t& timestamp, typename ConditionalCallback<fsm_timestamp_t>::cb_compval_t cb, bool invert) { return addConditional(new ChronoEvent(key, timestamp, cb, invert)); }
+ConditionalCallback<fsm_timestamp_t>* Chronograph::addEvent(const fsm_timestamp_t& timestamp, typename ConditionalCallback<fsm_timestamp_t>::cb_compvalrefargs_t cb, const CallbackArgs* callbackArgs, bool invert) { return addConditional(new ChronoEvent(timestamp, cb, callbackArgs, invert)); }
+ConditionalCallback<fsm_timestamp_t>* Chronograph::addEvent(fsm_key_t key, const fsm_timestamp_t& timestamp, typename ConditionalCallback<fsm_timestamp_t>::cb_compvalrefargs_t cb, const CallbackArgs* callbackArgs, bool invert) { return addConditional(new ChronoEvent(key, timestamp, cb, callbackArgs, invert)); }
+ConditionalCallback<fsm_timestamp_t>* Chronograph::addEvent(const fsm_timestamp_t& timestamp, typename ConditionalCallback<fsm_timestamp_t>::cb_compvalrefargs_t cb, const CallbackArgs& callbackArgs, bool invert) { return addEvent(timestamp, cb, &callbackArgs, invert); }
+ConditionalCallback<fsm_timestamp_t>* Chronograph::addEvent(fsm_key_t key, const fsm_timestamp_t& timestamp, typename ConditionalCallback<fsm_timestamp_t>::cb_compvalrefargs_t cb, const CallbackArgs& callbackArgs, bool invert) { return addEvent(key, timestamp, cb, &callbackArgs, invert); }
 
 ChronoEvent* Chronograph::addEventFlag(const fsm_timestamp_t& timestamp, Flag* flag, bool invert) { 
   return addEventFlag(flag->getKey(), timestamp, flag, invert); }  
@@ -225,6 +233,14 @@ ChronoEvent* Chronograph::addEventFlag(fsm_key_t key, const fsm_timestamp_t& tim
   addConditional(event);
   return event;
 }  
+
+ConditionalCallback<fsm_timestamp_t>* Chronograph::addEventFlag(const fsm_timestamp_t& timestamp, typename ConditionalCallback<fsm_timestamp_t>::cb_compvalrefargs_t cb, const Flag& callbackFlag, bool invert) {
+  return addEventFlag(callbackFlag.getKey(), timestamp, cb, callbackFlag, invert);
+}
+
+ConditionalCallback<fsm_timestamp_t>* Chronograph::addEventFlag(fsm_key_t key, const fsm_timestamp_t& timestamp, typename ConditionalCallback<fsm_timestamp_t>::cb_compvalrefargs_t cb, const Flag& callbackFlag, bool invert) {
+  return addConditional(new ChronoEvent(key, timestamp, cb, new CallbacksArgsFlag(callbackFlag), invert, true));
+}
 
 IntervalCallback* Chronograph::addInterval(const fsm_timestamp_t& delta, typename ConditionalCallback<fsm_timestamp_t>::cb_compval_t cb, bool invert) { 
   return this->addInterval(delta, 0, cb, invert);
@@ -263,6 +279,76 @@ IntervalCallback* Chronograph::addInterval(fsm_key_t key, const fsm_timestamp_t&
   #endif
 
   return intervals[n];
+}
+
+IntervalCallback* Chronograph::addInterval(const fsm_timestamp_t& delta, typename ConditionalCallback<fsm_timestamp_t>::cb_compvalrefargs_t cb, const CallbackArgs* callbackArgs, bool invert) {
+  return this->addInterval(delta, 0, cb, callbackArgs, invert, false);
+}
+
+IntervalCallback* Chronograph::addInterval(fsm_key_t key, const fsm_timestamp_t& delta, typename ConditionalCallback<fsm_timestamp_t>::cb_compvalrefargs_t cb, const CallbackArgs* callbackArgs, bool invert) {
+  return this->addInterval(key, delta, 0, cb, callbackArgs, invert, false);
+}
+
+IntervalCallback* Chronograph::addInterval(const fsm_timestamp_t& delta, const fsm_timestamp_t& phase, typename ConditionalCallback<fsm_timestamp_t>::cb_compvalrefargs_t cb, const CallbackArgs* callbackArgs, bool invert) {
+  return this->addInterval(FSM_KEY_NULL, delta, phase, cb, callbackArgs, invert, false);
+}
+
+IntervalCallback* Chronograph::addInterval(fsm_key_t key, const fsm_timestamp_t& delta, const fsm_timestamp_t& phase, typename ConditionalCallback<fsm_timestamp_t>::cb_compvalrefargs_t cb, const CallbackArgs* callbackArgs, bool invert) {
+  return this->addInterval(key, delta, phase, cb, callbackArgs, invert, false);
+}
+
+IntervalCallback* Chronograph::addInterval(const fsm_timestamp_t& delta, typename ConditionalCallback<fsm_timestamp_t>::cb_compvalrefargs_t cb, const CallbackArgs* callbackArgs, bool invert, bool ownsCallbackArgs) {
+  return this->addInterval(delta, 0, cb, callbackArgs, invert, ownsCallbackArgs);
+}
+
+IntervalCallback* Chronograph::addInterval(fsm_key_t key, const fsm_timestamp_t& delta, typename ConditionalCallback<fsm_timestamp_t>::cb_compvalrefargs_t cb, const CallbackArgs* callbackArgs, bool invert, bool ownsCallbackArgs) {
+  return this->addInterval(key, delta, 0, cb, callbackArgs, invert, ownsCallbackArgs);
+}
+
+IntervalCallback* Chronograph::addInterval(const fsm_timestamp_t& delta, const fsm_timestamp_t& phase, typename ConditionalCallback<fsm_timestamp_t>::cb_compvalrefargs_t cb, const CallbackArgs* callbackArgs, bool invert, bool ownsCallbackArgs) {
+  return this->addInterval(FSM_KEY_NULL, delta, phase, cb, callbackArgs, invert, ownsCallbackArgs);
+}
+
+IntervalCallback* Chronograph::addInterval(fsm_key_t key, const fsm_timestamp_t& delta, const fsm_timestamp_t& phase, typename ConditionalCallback<fsm_timestamp_t>::cb_compvalrefargs_t cb, const CallbackArgs* callbackArgs, bool invert, bool ownsCallbackArgs) {
+  unsigned int n = 0;
+  while(intervals[n] != nullptr) { n++; if(n >= MAX_INTERVALS) { return nullptr;}}
+
+  intervals[n] = new IntervalCallback(key, delta, phase, (const void*)cb, CB_COMPVALREFARGS, invert, callbackArgs, ownsCallbackArgs);
+
+  #ifdef DEBUG_JSON
+    #ifdef DEBUG_USE_BP
+      BP_JSON();
+    #else
+      String m = _F("Chrono: Add Interval ");
+      if(key != FSM_KEY_NULL) { m += '\''; m += key; m += "' "; }
+      m += "(";
+      m += delta;
+      if(phase > 0) {
+        m += '+';
+        m += phase;
+      }
+      m += "ms)";
+      DEBUG_JSON(m);
+    #endif
+  #endif
+
+  return intervals[n];
+}
+
+IntervalCallback* Chronograph::addInterval(const fsm_timestamp_t& delta, typename ConditionalCallback<fsm_timestamp_t>::cb_compvalrefargs_t cb, const CallbackArgs& callbackArgs, bool invert) {
+  return this->addInterval(delta, cb, &callbackArgs, invert, false);
+}
+
+IntervalCallback* Chronograph::addInterval(fsm_key_t key, const fsm_timestamp_t& delta, typename ConditionalCallback<fsm_timestamp_t>::cb_compvalrefargs_t cb, const CallbackArgs& callbackArgs, bool invert) {
+  return this->addInterval(key, delta, cb, &callbackArgs, invert, false);
+}
+
+IntervalCallback* Chronograph::addInterval(const fsm_timestamp_t& delta, const fsm_timestamp_t& phase, typename ConditionalCallback<fsm_timestamp_t>::cb_compvalrefargs_t cb, const CallbackArgs& callbackArgs, bool invert) {
+  return this->addInterval(delta, phase, cb, &callbackArgs, invert, false);
+}
+
+IntervalCallback* Chronograph::addInterval(fsm_key_t key, const fsm_timestamp_t& delta, const fsm_timestamp_t& phase, typename ConditionalCallback<fsm_timestamp_t>::cb_compvalrefargs_t cb, const CallbackArgs& callbackArgs, bool invert) {
+  return this->addInterval(key, delta, phase, cb, &callbackArgs, invert, false);
 }
 
 IntervalCallback* Chronograph::addIntervalFlag(const fsm_timestamp_t& delta, const fsm_timestamp_t& phase, Flag* flag, bool invert) { return this->addIntervalFlag(flag->getKey(), delta, phase, flag, invert); }
@@ -310,6 +396,52 @@ IntervalCallback* Chronograph::addIntervalFlag(const fsm_timestamp_t& delta, Fla
 
 IntervalCallback* Chronograph::addIntervalFlag(fsm_key_t key, const fsm_timestamp_t& delta, Flag* flag, bool invert) { 
   return this->addIntervalFlag(key, delta, 0, flag, invert);
+}
+
+IntervalCallback* Chronograph::addIntervalFlag(const fsm_timestamp_t& delta, typename ConditionalCallback<fsm_timestamp_t>::cb_compvalrefargs_t cb, const Flag& callbackFlag, bool invert) {
+  return this->addIntervalFlag(callbackFlag.getKey(), delta, 0, cb, callbackFlag, invert);
+}
+
+IntervalCallback* Chronograph::addIntervalFlag(fsm_key_t key, const fsm_timestamp_t& delta, typename ConditionalCallback<fsm_timestamp_t>::cb_compvalrefargs_t cb, const Flag& callbackFlag, bool invert) {
+  return this->addIntervalFlag(key, delta, 0, cb, callbackFlag, invert);
+}
+
+IntervalCallback* Chronograph::addIntervalFlag(const fsm_timestamp_t& delta, const fsm_timestamp_t& phase, typename ConditionalCallback<fsm_timestamp_t>::cb_compvalrefargs_t cb, const Flag& callbackFlag, bool invert) {
+  return this->addIntervalFlag(callbackFlag.getKey(), delta, phase, cb, callbackFlag, invert);
+}
+
+IntervalCallback* Chronograph::addIntervalFlag(fsm_key_t key, const fsm_timestamp_t& delta, const fsm_timestamp_t& phase, typename ConditionalCallback<fsm_timestamp_t>::cb_compvalrefargs_t cb, const Flag& callbackFlag, bool invert) {
+  unsigned int n = 0;
+  while(intervals[n] != nullptr) { n++; if(n >= MAX_INTERVALS) return nullptr;}
+
+  intervals[n] = new IntervalCallback(key, delta, phase, (const void*)cb, CB_COMPVALREFARGS, invert, new CallbacksArgsFlag(callbackFlag), true);
+  if(intervals[n] == nullptr) { return nullptr; }
+
+  #ifdef DEBUG_JSON
+    #ifdef DEBUG_USE_BP
+      BP_JSON();
+    #else
+      String m = _F("Chrono: Add FlagInterval ");
+      if(key != FSM_KEY_NULL) { m += '\''; m += key; m += "' "; }
+      m += '(';
+      m += timestampToString(delta);
+      if(phase > 0) {
+        m += " + ";
+        m += timestampToString(phase);
+      }
+      if(invert) m += ", INV";
+      if(callbackFlag.getKey() != FSM_KEY_NULL) {
+        m += ", Flag '";
+        m += callbackFlag.getKey();
+        m += "')";
+      } else {
+        m += ')';
+      }
+      DEBUG_JSON(m);
+    #endif
+  #endif
+
+  return intervals[n];
 }
 
 IntervalCallback* Chronograph::addTwentyFourTimeout(const fsm_timestamp_t& phase, typename ConditionalCallback<fsm_timestamp_t>::cb_compval_t cb, bool invert) { return addTwentyFourTimeout(FSM_KEY_NULL, phase, cb, invert); }

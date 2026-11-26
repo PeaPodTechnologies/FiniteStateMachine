@@ -21,7 +21,7 @@
 
 namespace FSM {
 
-  template <typename T> ConditionalCallback<T>::ConditionalCallback(fsm_key_t key, comparators_t cmp, const T& ref, const void* cb, callback_type_t cbtype, bool invert, cb_getref_t getReference) : key(key), comparator(cmp), reference(ref), callback(cb), callbacktype(cbtype), invert(invert), getReference(getReference) {
+  template <typename T> ConditionalCallback<T>::ConditionalCallback(fsm_key_t key, comparators_t cmp, const T& ref, const void* cb, callback_type_t cbtype, bool invert, cb_getref_t getReference, const CallbackArgs* callbackArgs, bool ownsCallbackArgs) : key(key), comparator(cmp), reference(ref), callback(cb), callbackArgs(callbackArgs), ownsCallbackArgs(ownsCallbackArgs), callbacktype(cbtype), invert(invert), getReference(getReference) {
     #ifdef DEBUG_JSON
       #ifdef DEBUG_USE_BP
         BP_JSON();
@@ -48,6 +48,9 @@ namespace FSM {
           if(this->callbacktype >= CB_COMPVALREF) {
             m += _F(", ref");
           }
+          if(this->callbacktype >= CB_COMPVALREFARGS) {
+            m += _F(", args");
+          }
           m+= _F("] @0x");
           m += String((unsigned long)this->callback, HEX);
         }
@@ -64,12 +67,14 @@ namespace FSM {
   template <typename T> ConditionalCallback<T>::ConditionalCallback(fsm_key_t key, comparators_t cmp, const T& ref, cb_compval_t cb, bool invert, cb_getref_t getReference) : ConditionalCallback(key, cmp, ref, (const void*)cb, CB_COMPVAL, invert, getReference) { }
 
   template <typename T> ConditionalCallback<T>::ConditionalCallback(fsm_key_t key, comparators_t cmp, const T& ref, cb_compvalref_t cb, bool invert, cb_getref_t getReference) : ConditionalCallback(key, cmp, ref, (const void*)cb, CB_COMPVALREF, invert, getReference) { }
+  template <typename T> ConditionalCallback<T>::ConditionalCallback(fsm_key_t key, comparators_t cmp, const T& ref, cb_compvalrefargs_t cb, bool invert, const CallbackArgs* callbackArgs, cb_getref_t getReference, bool ownsCallbackArgs) : ConditionalCallback(key, cmp, ref, (const void*)cb, CB_COMPVALREFARGS, invert, getReference, callbackArgs, ownsCallbackArgs) { }
+  template <typename T> ConditionalCallback<T>::ConditionalCallback(fsm_key_t key, comparators_t cmp, const T& ref, cb_compvalrefargs_t cb, bool invert, const CallbackArgs& callbackArgs, cb_getref_t getReference) : ConditionalCallback(key, cmp, ref, cb, invert, &callbackArgs, getReference) { }
 
   template <typename T> ConditionalCallback<T>::ConditionalCallback(fsm_key_t key, comparators_t cmp, const T& ref, bool invert, cb_getref_t getReference) : ConditionalCallback(key, cmp, ref, nullptr, CB_COMP, invert, getReference) { }
 
   // WITH KEYS WITHOUT INVERT
 
-  template <typename T> ConditionalCallback<T>::ConditionalCallback(fsm_key_t key, comparators_t cmp, const T& ref, const void* cb, callback_type_t cbtype, cb_getref_t getReference) : ConditionalCallback<T>::ConditionalCallback(key, cmp, ref, cb, cbtype, false, getReference) { }
+  template <typename T> ConditionalCallback<T>::ConditionalCallback(fsm_key_t key, comparators_t cmp, const T& ref, const void* cb, callback_type_t cbtype, cb_getref_t getReference, const CallbackArgs* callbackArgs, bool ownsCallbackArgs) : ConditionalCallback<T>::ConditionalCallback(key, cmp, ref, cb, cbtype, false, getReference, callbackArgs, ownsCallbackArgs) { }
 
   template <typename T> ConditionalCallback<T>::ConditionalCallback(fsm_key_t key, comparators_t cmp, const T& ref, cb_none_t cb, cb_getref_t getReference) : ConditionalCallback(key, cmp, ref, (const void*)cb, CB_NONE, getReference) { }
 
@@ -78,12 +83,14 @@ namespace FSM {
   template <typename T> ConditionalCallback<T>::ConditionalCallback(fsm_key_t key, comparators_t cmp, const T& ref, cb_compval_t cb, cb_getref_t getReference) : ConditionalCallback(key, cmp, ref, (const void*)cb, CB_COMPVAL, getReference) { }
 
   template <typename T> ConditionalCallback<T>::ConditionalCallback(fsm_key_t key, comparators_t cmp, const T& ref, cb_compvalref_t cb, cb_getref_t getReference) : ConditionalCallback(key, cmp, ref, (const void*)cb, CB_COMPVALREF, getReference) { }
+  template <typename T> ConditionalCallback<T>::ConditionalCallback(fsm_key_t key, comparators_t cmp, const T& ref, cb_compvalrefargs_t cb, const CallbackArgs* callbackArgs, cb_getref_t getReference, bool ownsCallbackArgs) : ConditionalCallback(key, cmp, ref, (const void*)cb, CB_COMPVALREFARGS, getReference, callbackArgs, ownsCallbackArgs) { }
+  template <typename T> ConditionalCallback<T>::ConditionalCallback(fsm_key_t key, comparators_t cmp, const T& ref, cb_compvalrefargs_t cb, const CallbackArgs& callbackArgs, cb_getref_t getReference) : ConditionalCallback(key, cmp, ref, cb, &callbackArgs, getReference) { }
 
   template <typename T> ConditionalCallback<T>::ConditionalCallback(fsm_key_t key, comparators_t cmp, const T& ref, cb_getref_t getReference) : ConditionalCallback(key, cmp, ref, nullptr, CB_COMP, getReference) { }
 
   // WITHOUT KEYS WITH INVERT
 
-  template <typename T> ConditionalCallback<T>::ConditionalCallback(comparators_t cmp, const T& ref, const void* cb, callback_type_t cbtype, bool invert, cb_getref_t getReference) : ConditionalCallback<T>(FSM_KEY_NULL, cmp, ref, cb, cbtype, invert, getReference) { }
+  template <typename T> ConditionalCallback<T>::ConditionalCallback(comparators_t cmp, const T& ref, const void* cb, callback_type_t cbtype, bool invert, cb_getref_t getReference, const CallbackArgs* callbackArgs, bool ownsCallbackArgs) : ConditionalCallback<T>(FSM_KEY_NULL, cmp, ref, cb, cbtype, invert, getReference, callbackArgs, ownsCallbackArgs) { }
 
   template <typename T> ConditionalCallback<T>::ConditionalCallback(comparators_t cmp, const T& ref, cb_none_t cb, bool invert, cb_getref_t getReference) : ConditionalCallback(cmp, ref, (const void*)cb, CB_NONE, invert, getReference) { }
 
@@ -92,12 +99,14 @@ namespace FSM {
   template <typename T> ConditionalCallback<T>::ConditionalCallback(comparators_t cmp, const T& ref, cb_compval_t cb, bool invert, cb_getref_t getReference) : ConditionalCallback(cmp, ref, (const void*)cb, CB_COMPVAL, invert, getReference) { }
 
   template <typename T> ConditionalCallback<T>::ConditionalCallback(comparators_t cmp, const T& ref, cb_compvalref_t cb, bool invert, cb_getref_t getReference) : ConditionalCallback(cmp, ref, (const void*)cb, CB_COMPVALREF, invert, getReference) { }
+  template <typename T> ConditionalCallback<T>::ConditionalCallback(comparators_t cmp, const T& ref, cb_compvalrefargs_t cb, bool invert, const CallbackArgs* callbackArgs, cb_getref_t getReference, bool ownsCallbackArgs) : ConditionalCallback(cmp, ref, (const void*)cb, CB_COMPVALREFARGS, invert, getReference, callbackArgs, ownsCallbackArgs) { }
+  template <typename T> ConditionalCallback<T>::ConditionalCallback(comparators_t cmp, const T& ref, cb_compvalrefargs_t cb, bool invert, const CallbackArgs& callbackArgs, cb_getref_t getReference) : ConditionalCallback(cmp, ref, cb, invert, &callbackArgs, getReference) { }
 
   template <typename T> ConditionalCallback<T>::ConditionalCallback(comparators_t cmp, const T& ref, bool invert, cb_getref_t getReference) : ConditionalCallback(cmp, ref, nullptr, CB_COMP, invert, getReference) { }
 
   // WITHOUT KEYS WITHOUT INVERT
 
-  template <typename T> ConditionalCallback<T>::ConditionalCallback(comparators_t cmp, const T& ref, const void* cb, callback_type_t cbtype, cb_getref_t getReference) : ConditionalCallback<T>(FSM_KEY_NULL, cmp, ref, cb, cbtype, getReference) { }
+  template <typename T> ConditionalCallback<T>::ConditionalCallback(comparators_t cmp, const T& ref, const void* cb, callback_type_t cbtype, cb_getref_t getReference, const CallbackArgs* callbackArgs, bool ownsCallbackArgs) : ConditionalCallback<T>(FSM_KEY_NULL, cmp, ref, cb, cbtype, getReference, callbackArgs, ownsCallbackArgs) { }
 
   template <typename T> ConditionalCallback<T>::ConditionalCallback(comparators_t cmp, const T& ref, cb_none_t cb, cb_getref_t getReference) : ConditionalCallback(cmp, ref, (const void*)cb, CB_NONE, getReference) { }
 
@@ -106,10 +115,12 @@ namespace FSM {
   template <typename T> ConditionalCallback<T>::ConditionalCallback(comparators_t cmp, const T& ref, cb_compval_t cb, cb_getref_t getReference) : ConditionalCallback(cmp, ref, (const void*)cb, CB_COMPVAL, getReference) { }
 
   template <typename T> ConditionalCallback<T>::ConditionalCallback(comparators_t cmp, const T& ref, cb_compvalref_t cb, cb_getref_t getReference) : ConditionalCallback(cmp, ref, (const void*)cb, CB_COMPVALREF, getReference) { }
+  template <typename T> ConditionalCallback<T>::ConditionalCallback(comparators_t cmp, const T& ref, cb_compvalrefargs_t cb, const CallbackArgs* callbackArgs, cb_getref_t getReference, bool ownsCallbackArgs) : ConditionalCallback(cmp, ref, (const void*)cb, CB_COMPVALREFARGS, getReference, callbackArgs, ownsCallbackArgs) { }
+  template <typename T> ConditionalCallback<T>::ConditionalCallback(comparators_t cmp, const T& ref, cb_compvalrefargs_t cb, const CallbackArgs& callbackArgs, cb_getref_t getReference) : ConditionalCallback(cmp, ref, cb, &callbackArgs, getReference) { }
 
   template <typename T> ConditionalCallback<T>::ConditionalCallback(comparators_t cmp, const T& ref, cb_getref_t getReference) : ConditionalCallback(cmp, ref, nullptr, CB_COMP, getReference) { }
 
-  template <typename T> ConditionalCallback<T>& ConditionalCallback<T>::operator=(ConditionalCallback<T> const& other) { return ConditionalCallback<T>(other.comparator, other.reference, other.callback, other.callbacktype, other.getReference); }
+  template <typename T> ConditionalCallback<T>& ConditionalCallback<T>::operator=(ConditionalCallback<T> const& other) { return ConditionalCallback<T>(other.comparator, other.reference, other.callback, other.callbacktype, other.getReference, other.callbackArgs, false); }
 
   template <typename T> void ConditionalCallback<T>::childCallback(bool comp, const T& val, const T& ref) { return; }
   template <typename T> const T& ConditionalCallback<T>::childReference(const T& val) { return this->reference; }
@@ -199,6 +210,9 @@ namespace FSM {
         if(this->callbacktype >= CB_COMPVALREF) {
           m += ", "; m += stateToString<T>(ref);
         }
+        if(this->callbacktype >= CB_COMPVALREFARGS) {
+          m += ", args";
+        }
         m += ')';
         BP_JSON(m);
       #else
@@ -211,6 +225,9 @@ namespace FSM {
         }
         if(this->callbacktype >= CB_COMPVALREF) {
           m += _F(", ref");
+        }
+        if(this->callbacktype >= CB_COMPVALREFARGS) {
+          m += _F(", args");
         }
         m += ']';
         if(invert) m += _F(" (INV)");
@@ -265,6 +282,9 @@ namespace FSM {
         break;
       case CB_COMPVALREF:
         ((cb_compvalref_t)this->callback)(_, val, ref);
+        break;
+      case CB_COMPVALREFARGS:
+        ((cb_compvalrefargs_t)this->callback)(_, val, ref, this->callbackArgs);
         break;
     }
     // delay(1);
