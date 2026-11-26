@@ -65,7 +65,7 @@ Flag* disco; void controlDisco(bool _, const bool& __); void scrollDisco(bool _,
 
 void setup() {
   // Serial
-  Serial.begin(115200);
+  Serial.begin(460800);
   while(!Serial);
 
   // Pin Modes

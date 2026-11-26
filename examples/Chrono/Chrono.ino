@@ -52,7 +52,7 @@ Flag disco = Flag();
 
 void setup() {
   // Serial
-  Serial.begin(115200);
+  Serial.begin(460800);
   while(!Serial);
 
   // Pin Modes
